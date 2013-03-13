@@ -2,10 +2,10 @@ package edu.ub.ahstfg.features;
 
 import org.apache.hadoop.io.Writable;
 
-public class DocumentFeature<T extends Writable> {
+public class DocumentFeature {
 
     private String name;
-    private T instance;
+    private Writable instance;
     private double weight;
 
     public DocumentFeature(String name, double weight) {
@@ -21,11 +21,11 @@ public class DocumentFeature<T extends Writable> {
         this.name = name;
     }
 
-    public T getInstance() {
+    public Writable getInstance() {
         return instance;
     }
 
-    public void setInstance(T instance) {
+    public void setInstance(Writable instance) {
         this.instance = instance;
     }
 

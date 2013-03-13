@@ -23,8 +23,22 @@ public class DocumentDescriptor {
 
     public static DocumentDescriptor defaultDescriptor() {
         DocumentDescriptor ret = new DocumentDescriptor();
-        ret.addFeature(new FeatureDescriptor("terms", TextArrayWritable.class, 0.5));
-        ret.addFeature(new FeatureDescriptor("keywords", TextArrayWritable.class, 0.5));
+        ret.addFeature(new FeatureDescriptor("terms", TextArrayWritable.class,
+                0.5));
+        ret.addFeature(new FeatureDescriptor("keywords",
+                TextArrayWritable.class, 0.5));
+        return ret;
+    }
+
+    public List<DocumentFeature> getFeatureList()
+            throws InstantiationException, IllegalAccessException {
+        List<DocumentFeature> ret = new ArrayList<DocumentFeature>();
+        DocumentFeature f;
+        for (FeatureDescriptor feature : features) {
+            f = new DocumentFeature(feature.name, feature.weight);
+            f.setInstance(feature.fClass.newInstance());
+            ret.add(f);
+        }
         return ret;
     }
 
