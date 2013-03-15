@@ -44,7 +44,7 @@ MAIN_CLASS     = edu.ub.ahstfg.indexer.wordcount.WordCount
 ARGS           = input output
 
 INPUT_DIR      = ~/Desktop/testWordCount/input
-INPUT_FILES    = /*.txt
+INPUT_FILES    = /*.arc.gz
 OUTPUT_DIR     = ~/Desktop/testWordCount/
 
 RUN            = $(HADOOP_EXE) jar $(JAR_DIR) $(MAIN_CLASS) $(ARGS)
