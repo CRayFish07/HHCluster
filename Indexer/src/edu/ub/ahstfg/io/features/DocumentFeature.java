@@ -1,4 +1,4 @@
-package edu.ub.ahstfg.features;
+package edu.ub.ahstfg.io.features;
 
 import org.apache.hadoop.io.Writable;
 

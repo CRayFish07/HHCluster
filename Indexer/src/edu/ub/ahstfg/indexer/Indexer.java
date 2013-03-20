@@ -1,4 +1,4 @@
-package edu.ub.ahstfg.indexer.wordcount;
+package edu.ub.ahstfg.indexer;
 
 import java.net.URI;
 
@@ -13,28 +13,28 @@ import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.TextOutputFormat;
-import org.apache.hadoop.mapred.lib.LongSumReducer;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 import org.commoncrawl.hadoop.mapred.ArcInputFormat;
 
-public class WordCount extends Configured implements Tool {
+import edu.ub.ahstfg.indexer.wordcount.WordCount;
+
+public class Indexer extends Configured implements Tool {
 
     private static final Logger LOG = Logger.getLogger(WordCount.class);
 
     private String inputPath;
     private String outputPath;
 
-    public WordCount(String inputPath, String outputPath) {
+    public Indexer(String inputPath, String outputPath) {
         this.inputPath = inputPath;
         this.outputPath = outputPath;
     }
 
     @Override
-    public int run(String[] args) throws Exception {
-
-        LOG.info("Creating Hadoop job for ARC input files word count.");
+    public int run(String[] arg0) throws Exception {
+        LOG.info("Creating Hadoop job for Indexer.");
         JobConf job = new JobConf(getConf());
         job.setJarByClass(WordCount.class);
 
@@ -66,8 +66,8 @@ public class WordCount extends Configured implements Tool {
 
         LOG.info("Setting mapper and reducer.");
         // job.setMapperClass(WordCountTextInputMapper.class);
-        job.setMapperClass(WordCountArcInputMapper.class);
-        job.setReducerClass(LongSumReducer.class);
+        job.setMapperClass(IndexerMapper.class);
+        job.setReducerClass(IndexerReducer.class);
 
         if (JobClient.runJob(job).isSuccessful()) {
             return 0;
