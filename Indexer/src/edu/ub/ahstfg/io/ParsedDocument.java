@@ -9,7 +9,7 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Writable;
 
-public class Document implements Writable {
+public class ParsedDocument implements Writable {
 
     private static final byte N_FEATURES = 2;
 
@@ -21,11 +21,11 @@ public class Document implements Writable {
     private ArrayWritable terms;
     private DoubleWritable termsWeight;
 
-    public Document() {
+    public ParsedDocument() {
         this(1.0 / N_FEATURES, 1.0 / N_FEATURES);
     }
 
-    public Document(double keywordsWeight, double termsWeight) {
+    public ParsedDocument(double keywordsWeight, double termsWeight) {
         keywords = new ArrayWritable(KEYWORD_CLASS);
         terms = new ArrayWritable(TERMS_CLASS);
         this.keywordsWeight = new DoubleWritable(keywordsWeight);
