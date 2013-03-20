@@ -73,14 +73,14 @@ h_format: h_hdfs_r
 	$(HADOOP_FORMAT)
 
 h_set_input:
-	$(HADOOP_EXE) fs -mkdir input
-	$(HADOOP_EXE) fs -put $(INPUT_DIR)$(INPUT_FILES) input
+	$(HADOOP_EXE) dfs -mkdir input
+	$(HADOOP_EXE) dfs -put $(INPUT_DIR)$(INPUT_FILES) input
 
-exec: h_set_input
+exec:
 	$(RUN)
 
-h_get_output: exec
-	$(HADOOP_EXE) fs -get output $(OUTPUT_DIR)
+h_get_output:
+	$(HADOOP_EXE) dfs -get output $(OUTPUT_DIR)
 
 run: h_get_output
 
