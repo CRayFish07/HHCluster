@@ -3,49 +3,85 @@ package edu.ub.ahstfg.io;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.HashMap;
 
-import org.apache.hadoop.io.ArrayWritable;
-import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.MapWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
 public class ParsedDocument implements Writable {
 
-    private static final byte N_FEATURES = 2;
+    private static final LongWritable ONE = new LongWritable(1);
 
-    private static final Class<IntWritable> KEYWORD_CLASS = IntWritable.class;
-    private ArrayWritable keywords;
-    private DoubleWritable keywordsWeight;
-
-    private static final Class<IntWritable> TERMS_CLASS = IntWritable.class;
-    private ArrayWritable terms;
-    private DoubleWritable termsWeight;
+    private MapWritable terms;
+    private MapWritable keywords;
 
     public ParsedDocument() {
-        this(1.0 / N_FEATURES, 1.0 / N_FEATURES);
+        terms = new MapWritable();
+        keywords = new MapWritable();
     }
 
-    public ParsedDocument(double keywordsWeight, double termsWeight) {
-        keywords = new ArrayWritable(KEYWORD_CLASS);
-        terms = new ArrayWritable(TERMS_CLASS);
-        this.keywordsWeight = new DoubleWritable(keywordsWeight);
-        this.termsWeight = new DoubleWritable(termsWeight);
+    public void addTerm(Text term) {
+        if (terms.containsKey(term)) {
+            LongWritable n = (LongWritable) terms.get(term);
+            terms.put(term, new LongWritable(n.get() + 1));
+        } else {
+            terms.put(term, ONE);
+        }
+    }
+
+    public void addTerm(String term) {
+        addTerm(new Text(term));
+    }
+
+    public HashMap<String, Long> getTermFreq() {
+        HashMap<String, Long> ret = new HashMap<String, Long>();
+        Text t;
+        LongWritable value;
+        for (Writable w : terms.keySet()) {
+            t = (Text) w;
+            value = (LongWritable) terms.get(w);
+            ret.put(t.toString(), value.get());
+        }
+        return ret;
+    }
+
+    public void addKeyword(Text keyword) {
+        if (terms.containsKey(keyword)) {
+            LongWritable n = (LongWritable) terms.get(keyword);
+            terms.put(keyword, new LongWritable(n.get() + 1));
+        } else {
+            terms.put(keyword, ONE);
+        }
+    }
+
+    public void addKeyword(String keyword) {
+        addTerm(new Text(keyword));
+    }
+
+    public HashMap<String, Long> getKeywordFreq() {
+        HashMap<String, Long> ret = new HashMap<String, Long>();
+        Text t;
+        LongWritable value;
+        for (Writable w : terms.keySet()) {
+            t = (Text) w;
+            value = (LongWritable) terms.get(w);
+            ret.put(t.toString(), value.get());
+        }
+        return ret;
     }
 
     @Override
     public void readFields(DataInput input) throws IOException {
-        keywords.readFields(input);
-        keywordsWeight.readFields(input);
         terms.readFields(input);
-        termsWeight.readFields(input);
+        keywords.readFields(input);
     }
 
     @Override
     public void write(DataOutput output) throws IOException {
-        keywords.write(output);
-        keywordsWeight.write(output);
         terms.write(output);
-        termsWeight.write(output);
+        keywords.write(output);
     }
 
 }
