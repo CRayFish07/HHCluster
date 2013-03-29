@@ -12,7 +12,9 @@ import org.apache.hadoop.io.Writable;
 
 public class ParsedDocument implements Writable {
 
-    private static final LongWritable ONE = new LongWritable(1);
+    private static final LongWritable ONE() {
+        return new LongWritable(1);
+    }
 
     private MapWritable terms;
     private MapWritable keywords;
@@ -27,7 +29,7 @@ public class ParsedDocument implements Writable {
             LongWritable n = (LongWritable) terms.get(term);
             terms.put(term, new LongWritable(n.get() + 1));
         } else {
-            terms.put(term, ONE);
+            terms.put(term, ONE());
         }
     }
 
@@ -48,25 +50,25 @@ public class ParsedDocument implements Writable {
     }
 
     public void addKeyword(Text keyword) {
-        if (terms.containsKey(keyword)) {
-            LongWritable n = (LongWritable) terms.get(keyword);
-            terms.put(keyword, new LongWritable(n.get() + 1));
+        if (keywords.containsKey(keyword)) {
+            LongWritable n = (LongWritable) keywords.get(keyword);
+            keywords.put(keyword, new LongWritable(n.get() + 1));
         } else {
-            terms.put(keyword, ONE);
+            keywords.put(keyword, ONE());
         }
     }
 
     public void addKeyword(String keyword) {
-        addTerm(new Text(keyword));
+        addKeyword(new Text(keyword));
     }
 
     public HashMap<String, Long> getKeywordFreq() {
         HashMap<String, Long> ret = new HashMap<String, Long>();
         Text t;
         LongWritable value;
-        for (Writable w : terms.keySet()) {
+        for (Writable w : keywords.keySet()) {
             t = (Text) w;
-            value = (LongWritable) terms.get(w);
+            value = (LongWritable) keywords.get(w);
             ret.put(t.toString(), value.get());
         }
         return ret;
