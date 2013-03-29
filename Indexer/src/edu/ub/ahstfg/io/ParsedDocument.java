@@ -37,7 +37,7 @@ public class ParsedDocument implements Writable {
         addTerm(new Text(term));
     }
 
-    public HashMap<String, Long> getTermFreq() {
+    public HashMap<String, Long> getTermMap() {
         HashMap<String, Long> ret = new HashMap<String, Long>();
         Text t;
         LongWritable value;
@@ -45,6 +45,32 @@ public class ParsedDocument implements Writable {
             t = (Text) w;
             value = (LongWritable) terms.get(w);
             ret.put(t.toString(), value.get());
+        }
+        return ret;
+    }
+
+    public String[] getTermVector() {
+        String[] ret = new String[terms.size()];
+        Text t;
+        int i = 0;
+        for (Writable w : terms.keySet()) {
+            t = (Text) w;
+            ret[i] = t.toString();
+            i++;
+        }
+        return ret;
+    }
+
+    public long[] getTermFreqVector() {
+        long[] ret = new long[terms.size()];
+        Text t;
+        LongWritable v;
+        int i = 0;
+        for (Writable w : terms.keySet()) {
+            t = (Text) w;
+            v = (LongWritable) terms.get(t);
+            ret[i] = v.get();
+            i++;
         }
         return ret;
     }
@@ -62,7 +88,7 @@ public class ParsedDocument implements Writable {
         addKeyword(new Text(keyword));
     }
 
-    public HashMap<String, Long> getKeywordFreq() {
+    public HashMap<String, Long> getKeywordMap() {
         HashMap<String, Long> ret = new HashMap<String, Long>();
         Text t;
         LongWritable value;

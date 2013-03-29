@@ -13,13 +13,16 @@ public class TestParsedDocument {
         doc.addTerm("hola");
         doc.addTerm("palabra");
         doc.addTerm("hola");
+        doc.addTerm("asdasdads");
+        doc.addTerm("asdasdads");
+        doc.addTerm("asdasdads");
         doc.addKeyword("hola");
         doc.addKeyword("palabra");
         doc.addKeyword("hola");
         doc.addKeyword("palabra");
         doc.addKeyword("ola");
-        HashMap<String, Long> terms = doc.getTermFreq();
-        HashMap<String, Long> keywords = doc.getKeywordFreq();
+        HashMap<String, Long> terms = doc.getTermMap();
+        HashMap<String, Long> keywords = doc.getKeywordMap();
         System.out.println("Terms:");
         for (String term : terms.keySet()) {
             System.out
@@ -29,6 +32,14 @@ public class TestParsedDocument {
         for (String keyword : terms.keySet()) {
             System.out.println("Term: " + keyword + " -> Freq: "
                     + keywords.get(keyword));
+        }
+        String[] tv = doc.getTermVector();
+        long[] tf = doc.getTermFreqVector();
+        for (String s : tv) {
+            System.out.println(s);
+        }
+        for (long l : tf) {
+            System.out.println(l);
         }
     }
 
