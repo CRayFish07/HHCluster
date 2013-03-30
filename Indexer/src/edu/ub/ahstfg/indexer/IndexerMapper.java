@@ -49,13 +49,15 @@ public class IndexerMapper extends MapReduceBase implements
                 return;
             }
 
-            String text = doc.body().text();
-            StringTokenizer tokenizer = new StringTokenizer(text);
+            ParsedDocument pDoc = new ParsedDocument(value.getURL());
+
+            String bodyText = doc.body().text();
+            StringTokenizer tokenizer = new StringTokenizer(bodyText);
             String word;
             while (tokenizer.hasMoreTokens()) {
                 word = tokenizer.nextToken();
                 word = word.replaceAll("[^a-zA-Z]", "");
-                // output.collect(new Text(word.toLowerCase()), ONE);
+                pDoc.addTerm(word.toLowerCase());
             }
 
         }

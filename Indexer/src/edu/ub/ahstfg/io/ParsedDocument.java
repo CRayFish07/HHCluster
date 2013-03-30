@@ -16,12 +16,22 @@ public class ParsedDocument implements Writable {
         return new LongWritable(1);
     }
 
+    private Text url;
     private MapWritable terms;
     private MapWritable keywords;
 
     public ParsedDocument() {
         terms = new MapWritable();
         keywords = new MapWritable();
+    }
+
+    public ParsedDocument(Text url) {
+        this();
+        this.url = url;
+    }
+
+    public ParsedDocument(String url) {
+        this(new Text(url));
     }
 
     public void addTerm(Text term) {
@@ -102,12 +112,14 @@ public class ParsedDocument implements Writable {
 
     @Override
     public void readFields(DataInput input) throws IOException {
+        url.readFields(input);
         terms.readFields(input);
         keywords.readFields(input);
     }
 
     @Override
     public void write(DataOutput output) throws IOException {
+        url.write(output);
         terms.write(output);
         keywords.write(output);
     }
