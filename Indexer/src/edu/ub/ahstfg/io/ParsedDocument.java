@@ -47,6 +47,10 @@ public class ParsedDocument implements Writable {
         addTerm(new Text(term));
     }
 
+    public Text getUrl() {
+        return url;
+    }
+
     public HashMap<String, Long> getTermMap() {
         HashMap<String, Long> ret = new HashMap<String, Long>();
         Text t;
