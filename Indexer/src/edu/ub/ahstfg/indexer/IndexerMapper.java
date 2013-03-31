@@ -16,8 +16,8 @@ import edu.ub.ahstfg.io.ParsedDocument;
 public class IndexerMapper extends MapReduceBase implements
         Mapper<Text, ArcRecord, Text, ParsedDocument> {
 
-    // private final static LongWritable ONE = new LongWritable(1);
     private final String _counterGroup = "Custom Mapper Counters";
+    private static final Text KEY = new Text("doc");
 
     @Override
     public void map(Text key, ArcRecord value,
@@ -60,10 +60,9 @@ public class IndexerMapper extends MapReduceBase implements
                 pDoc.addTerm(word.toLowerCase());
             }
 
-            output.collect(new Text(value.getURL()), pDoc);
+            output.collect(KEY, pDoc);
 
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
 
             if (e.getClass().equals(OutOfMemoryError.class)) {
                 System.gc();

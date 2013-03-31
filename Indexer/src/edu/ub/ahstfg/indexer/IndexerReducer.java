@@ -21,6 +21,10 @@ public class IndexerReducer extends MapReduceBase implements
             OutputCollector<Text, Index> output, Reporter reporter)
             throws IOException {
 
+        if (values == null) {
+            return;
+        }
+
         Index index = new Index();
 
         ParsedDocument pDoc;
@@ -30,8 +34,10 @@ public class IndexerReducer extends MapReduceBase implements
             pDoc = values.next();
             url = pDoc.getUrl().toString();
             termMap = pDoc.getTermMap();
-            for (String term : termMap.keySet()) {
-                index.addTerm(term, url, termMap.get(term));
+            if (termMap != null) {
+                for (String term : termMap.keySet()) {
+                    index.addTerm(term, url, termMap.get(term));
+                }
             }
         }
 

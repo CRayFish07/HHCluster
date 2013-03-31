@@ -16,13 +16,13 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 import org.commoncrawl.hadoop.mapred.ArcInputFormat;
 
-import edu.ub.ahstfg.indexer.wordcount.WordCount;
 import edu.ub.ahstfg.io.Index;
+import edu.ub.ahstfg.io.ParsedDocument;
 import edu.ub.ahstfg.mapred.IndexOutputFormat;
 
 public class Indexer extends Configured implements Tool {
 
-    private static final Logger LOG = Logger.getLogger(WordCount.class);
+    private static final Logger LOG = Logger.getLogger(Indexer.class);
 
     private String inputPath;
     private String outputPath;
@@ -36,7 +36,7 @@ public class Indexer extends Configured implements Tool {
     public int run(String[] arg0) throws Exception {
         LOG.info("Creating Hadoop job for Indexer.");
         JobConf job = new JobConf(getConf());
-        job.setJarByClass(WordCount.class);
+        job.setJarByClass(Indexer.class);
 
         LOG.info("Setting input path to '" + inputPath + "'");
         FileInputFormat.setInputPaths(job, new Path(inputPath));
@@ -55,6 +55,7 @@ public class Indexer extends Configured implements Tool {
         FileOutputFormat.setCompressOutput(job, false);
 
         LOG.info("Setting input format.");
+        // job.setInputFormat(TextInputFormat.class);
         job.setInputFormat(ArcInputFormat.class);
         LOG.info("Setting output format.");
         job.setOutputFormat(IndexOutputFormat.class);
@@ -66,8 +67,9 @@ public class Indexer extends Configured implements Tool {
         LOG.info("Setting mapper and reducer.");
         // job.setMapperClass(WordCountTextInputMapper.class);
         job.setMapperClass(IndexerMapper.class);
+        job.setMapOutputValueClass(ParsedDocument.class);
         job.setReducerClass(IndexerReducer.class);
-        job.setNumReduceTasks(1);
+        // job.setNumReduceTasks(1);
 
         if (JobClient.runJob(job).isSuccessful()) {
             return 0;
@@ -81,7 +83,7 @@ public class Indexer extends Configured implements Tool {
         String outputPath = args[1];
         int res;
         try {
-            res = ToolRunner.run(new Configuration(), new WordCount(inputPath,
+            res = ToolRunner.run(new Configuration(), new Indexer(inputPath,
                     outputPath), args);
             System.exit(res);
         } catch (Exception e) {

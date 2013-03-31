@@ -17,6 +17,7 @@ public class IndexWriter implements RecordWriter<Text, Index> {
 
     public IndexWriter(DataOutputStream out) throws IOException {
         this.out = out;
+        out.writeBytes("<index>\n");
     }
 
     @Override
@@ -38,9 +39,9 @@ public class IndexWriter implements RecordWriter<Text, Index> {
             return;
         }
 
-        if (!nullValue) {
-            writeIndex(value);
-        }
+        // if (!nullValue) {
+        writeIndex(value);
+        // }
 
     }
 
@@ -48,7 +49,6 @@ public class IndexWriter implements RecordWriter<Text, Index> {
         String[] terms = index.getTermVector();
         String[] urls = index.getDocumentVector();
         long[][] freqs = index.getFreqMatrix();
-        out.writeBytes("<index>\n");
         out.writeBytes("<terms>\n");
         for (int i = 0; i < terms.length; i++) {
             out.writeBytes(terms[i] + ",");

@@ -21,6 +21,7 @@ public class ParsedDocument implements Writable {
     private MapWritable keywords;
 
     public ParsedDocument() {
+        url = new Text();
         terms = new MapWritable();
         keywords = new MapWritable();
     }
@@ -116,9 +117,9 @@ public class ParsedDocument implements Writable {
 
     @Override
     public void readFields(DataInput input) throws IOException {
-        url.readFields(input);
-        terms.readFields(input);
-        keywords.readFields(input);
+        url = new Text();
+        terms = new MapWritable();
+        keywords = new MapWritable();
     }
 
     @Override
