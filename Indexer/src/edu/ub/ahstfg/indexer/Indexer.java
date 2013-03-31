@@ -55,7 +55,6 @@ public class Indexer extends Configured implements Tool {
         FileOutputFormat.setCompressOutput(job, false);
 
         LOG.info("Setting input format.");
-        // job.setInputFormat(TextInputFormat.class);
         job.setInputFormat(ArcInputFormat.class);
         LOG.info("Setting output format.");
         job.setOutputFormat(IndexOutputFormat.class);
@@ -68,7 +67,7 @@ public class Indexer extends Configured implements Tool {
         // job.setMapperClass(WordCountTextInputMapper.class);
         job.setMapperClass(IndexerMapper.class);
         job.setReducerClass(IndexerReducer.class);
-        job.setNumReduceTasks(1); // TODO test
+        job.setNumReduceTasks(1);
 
         if (JobClient.runJob(job).isSuccessful()) {
             return 0;
@@ -85,8 +84,7 @@ public class Indexer extends Configured implements Tool {
             res = ToolRunner.run(new Configuration(), new WordCount(inputPath,
                     outputPath), args);
             System.exit(res);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.error(e.getMessage());
         }
     }
