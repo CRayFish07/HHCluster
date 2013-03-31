@@ -11,7 +11,6 @@ import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
@@ -19,6 +18,7 @@ import org.commoncrawl.hadoop.mapred.ArcInputFormat;
 
 import edu.ub.ahstfg.indexer.wordcount.WordCount;
 import edu.ub.ahstfg.io.Index;
+import edu.ub.ahstfg.mapred.IndexOutputFormat;
 
 public class Indexer extends Configured implements Tool {
 
@@ -58,7 +58,7 @@ public class Indexer extends Configured implements Tool {
         // job.setInputFormat(TextInputFormat.class);
         job.setInputFormat(ArcInputFormat.class);
         LOG.info("Setting output format.");
-        job.setOutputFormat(TextOutputFormat.class); // TODO correct?
+        job.setOutputFormat(IndexOutputFormat.class);
 
         LOG.info("Setting output data types.");
         job.setOutputKeyClass(Text.class);
@@ -68,6 +68,7 @@ public class Indexer extends Configured implements Tool {
         // job.setMapperClass(WordCountTextInputMapper.class);
         job.setMapperClass(IndexerMapper.class);
         job.setReducerClass(IndexerReducer.class);
+        job.setNumReduceTasks(1); // TODO test
 
         if (JobClient.runJob(job).isSuccessful()) {
             return 0;

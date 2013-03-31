@@ -60,6 +60,8 @@ public class IndexerMapper extends MapReduceBase implements
                 pDoc.addTerm(word.toLowerCase());
             }
 
+            output.collect(new Text(value.getURL()), pDoc);
+
         }
         catch (Throwable e) {
 
