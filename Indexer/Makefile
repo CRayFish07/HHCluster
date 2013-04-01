@@ -38,16 +38,16 @@ SRC_DIR        = /Users/alberto/direct/tfg_repo/Indexer/src
 SOURCES        = $(SRC_DIR)/edu/ub/ahstfg/indexer/wordcount/*.java
 
 JAVA_DIR       = /Users/alberto/Desktop/testWordCount/java
-JAR_DIR        = ~/Desktop/testWordCount/WordCount.jar
+JAR_DIR        = ~/Desktop/testWordCount/Indexer.jar
 
-MAIN_CLASS     = edu.ub.ahstfg.indexer.wordcount.WordCount
+MAIN_CLASS     = edu.ub.ahstfg.indexer.Indexer
 ARGS           = input output
 
 INPUT_DIR      = ~/Desktop/testWordCount/input
 INPUT_FILES    = /*.arc.gz
 OUTPUT_DIR     = ~/Desktop/testWordCount/
 
-RUN            = $(HADOOP_EXE) jar $(JAR_DIR) $(MAIN_CLASS) $(ARGS)
+RUN            = $(HADOOP_EXE) jar $(JAR_DIR) $(ARGS)
 
 all: clean jar
 
@@ -83,6 +83,9 @@ h_get_output:
 	$(HADOOP_EXE) dfs -get output $(OUTPUT_DIR)
 
 run: h_get_output
+
+clean:
+	rm -rf $(JAVA_DIR)
 
 clean:
 	rm -rf $(JAVA_DIR)

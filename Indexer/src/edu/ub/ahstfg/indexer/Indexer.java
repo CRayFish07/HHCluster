@@ -1,4 +1,4 @@
-package edu.ub.ahstfg.indexer.wordcount;
+package edu.ub.ahstfg.indexer;
 
 import java.net.URI;
 
@@ -6,37 +6,37 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.TextOutputFormat;
-import org.apache.hadoop.mapred.lib.LongSumReducer;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 import org.commoncrawl.hadoop.mapred.ArcInputFormat;
 
-public class WordCount extends Configured implements Tool {
+import edu.ub.ahstfg.indexer.mapred.IndexOutputFormat;
+import edu.ub.ahstfg.io.Index;
+import edu.ub.ahstfg.io.ParsedDocument;
 
-    private static final Logger LOG = Logger.getLogger(WordCount.class);
+public class Indexer extends Configured implements Tool {
+
+    private static final Logger LOG = Logger.getLogger(Indexer.class);
 
     private String inputPath;
     private String outputPath;
 
-    public WordCount(String inputPath, String outputPath) {
+    public Indexer(String inputPath, String outputPath) {
         this.inputPath = inputPath;
         this.outputPath = outputPath;
     }
 
     @Override
-    public int run(String[] args) throws Exception {
-
-        LOG.info("Creating Hadoop job for ARC input files word count.");
+    public int run(String[] arg0) throws Exception {
+        LOG.info("Creating Hadoop job for Indexer.");
         JobConf job = new JobConf(getConf());
-        job.setJarByClass(WordCount.class);
+        job.setJarByClass(Indexer.class);
 
         LOG.info("Setting input path to '" + inputPath + "'");
         FileInputFormat.setInputPaths(job, new Path(inputPath));
@@ -58,16 +58,18 @@ public class WordCount extends Configured implements Tool {
         // job.setInputFormat(TextInputFormat.class);
         job.setInputFormat(ArcInputFormat.class);
         LOG.info("Setting output format.");
-        job.setOutputFormat(TextOutputFormat.class);
+        job.setOutputFormat(IndexOutputFormat.class);
 
         LOG.info("Setting output data types.");
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(LongWritable.class);
+        job.setOutputValueClass(Index.class);
 
         LOG.info("Setting mapper and reducer.");
         // job.setMapperClass(WordCountTextInputMapper.class);
-        job.setMapperClass(WordCountArcInputMapper.class);
-        job.setReducerClass(LongSumReducer.class);
+        job.setMapperClass(IndexerMapper.class);
+        job.setMapOutputValueClass(ParsedDocument.class);
+        job.setReducerClass(IndexerReducer.class);
+        // job.setNumReduceTasks(1);
 
         if (JobClient.runJob(job).isSuccessful()) {
             return 0;
@@ -81,11 +83,10 @@ public class WordCount extends Configured implements Tool {
         String outputPath = args[1];
         int res;
         try {
-            res = ToolRunner.run(new Configuration(), new WordCount(inputPath,
+            res = ToolRunner.run(new Configuration(), new Indexer(inputPath,
                     outputPath), args);
             System.exit(res);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.error(e.getMessage());
         }
     }
