@@ -16,10 +16,13 @@ public class Index implements Writable {
 
     private ArrayList<String> terms;
     private HashMap<String, ArrayList<Long>> termFreq;
+    private ArrayList<String> keywords;
+    private HashMap<String, ArrayList<Long>> keywordFreq;
 
     public Index() {
         terms = new ArrayList<String>();
         termFreq = new HashMap<String, ArrayList<Long>>();
+        keywordFreq = new HashMap<String, ArrayList<Long>>();
     }
 
     public void addTerm(final String term, final String url, final long freq) {
@@ -54,7 +57,7 @@ public class Index implements Writable {
         return terms.toArray(new String[terms.size()]);
     }
 
-    public String[] getDocumentVector() {
+    public String[] getDocumentTermVector() {
         String[] ret = new String[termFreq.size()];
         int i = 0;
         for (String url : termFreq.keySet()) {
@@ -64,13 +67,72 @@ public class Index implements Writable {
         return ret;
     }
 
-    public long[][] getFreqMatrix() {
+    public long[][] getTermFreqMatrix() {
         long[][] ret = new long[termFreq.size()][terms.size()];
         int i = 0, j = 0;
         ArrayList<Long> freqs;
         for (String url : termFreq.keySet()) {
             freqs = termFreq.get(url);
             for (int k = 0; k < terms.size(); k++) {
+                ret[i][j] = freqs.get(j);
+                j++;
+            }
+            i++;
+            j = 0;
+        }
+        return ret;
+    }
+
+    public void addKeyword(final String keyword, final String url,
+            final long freq) {
+        if (!keywordFreq.containsKey(url)) {
+            ArrayList<Long> l = new ArrayList<Long>();
+            for (int i = 0; i < terms.size(); i++) {
+                l.add((long) 0);
+            }
+            keywordFreq.put(url, l);
+        }
+        if (keywords.contains(keyword)) {
+            final int index = keywords.indexOf(keyword);
+            ArrayList<Long> freqs = keywordFreq.get(url);
+            freqs.set(index, freqs.get(index) + freq);
+        } else {
+            keywords.add(keyword);
+            final int index = keywords.indexOf(keyword);
+            ArrayList<Long> freqs;
+            for (String storedUrl : keywordFreq.keySet()) {
+                freqs = keywordFreq.get(storedUrl);
+                if (storedUrl.equals(url)) {
+                    freqs.add((long) 0);
+                    freqs.set(index, freq);
+                } else {
+                    freqs.add((long) 0);
+                }
+            }
+        }
+    }
+
+    public String[] getKeywordVector() {
+        return keywords.toArray(new String[keywords.size()]);
+    }
+
+    public String[] getDocumentKeywordVector() {
+        String[] ret = new String[keywordFreq.size()];
+        int i = 0;
+        for (String url : keywordFreq.keySet()) {
+            ret[i] = url;
+            i++;
+        }
+        return ret;
+    }
+
+    public long[][] getKeywordFreqMatrix() {
+        long[][] ret = new long[keywordFreq.size()][keywords.size()];
+        int i = 0, j = 0;
+        ArrayList<Long> freqs;
+        for (String url : keywordFreq.keySet()) {
+            freqs = keywordFreq.get(url);
+            for (int k = 0; k < keywords.size(); k++) {
                 ret[i][j] = freqs.get(j);
                 j++;
             }
@@ -128,6 +190,14 @@ public class Index implements Writable {
         MapWritable wTermFreq = new MapWritable();
         wTermFreq.readFields(input);
         termFreq = mapWritable2HashMapStringArrayListLong(wTermFreq);
+
+        ArrayWritable wKeywords = new ArrayWritable(Text.class);
+        wKeywords.readFields(input);
+        keywords = arrayWritable2ArrayListString(wKeywords);
+
+        MapWritable wKeywordFreq = new MapWritable();
+        wKeywordFreq.readFields(input);
+        keywordFreq = mapWritable2HashMapStringArrayListLong(wKeywordFreq);
     }
 
     public static ArrayWritable arrayListString2ArrayWritable(
@@ -167,6 +237,8 @@ public class Index implements Writable {
     public void write(DataOutput output) throws IOException {
         arrayListString2ArrayWritable(terms).write(output);
         hashMapStringArrayListLong2MapWritable(termFreq).write(output);
+        arrayListString2ArrayWritable(keywords).write(output);
+        hashMapStringArrayListLong2MapWritable(keywordFreq).write(output);
     }
 
 }

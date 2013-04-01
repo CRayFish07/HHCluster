@@ -33,9 +33,9 @@ public class TestIndex {
         }
         System.out.println("");
 
-        String[] docVector = index.getDocumentVector();
+        String[] docVector = index.getDocumentTermVector();
 
-        long[][] freqMatrix = index.getFreqMatrix();
+        long[][] freqMatrix = index.getTermFreqMatrix();
         for (int i = 0; i < docVector.length; i++) {
             System.out.print(docVector[i] + ": ");
             for (int j = 0; j < termVector.length; j++) {

@@ -62,7 +62,8 @@ public class IndexerMapper extends MapReduceBase implements
 
             output.collect(KEY, pDoc);
 
-        } catch (Throwable e) {
+        }
+        catch (Throwable e) {
 
             if (e.getClass().equals(OutOfMemoryError.class)) {
                 System.gc();

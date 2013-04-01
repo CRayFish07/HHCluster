@@ -24,7 +24,8 @@ public class IndexWriter implements RecordWriter<Text, Index> {
     public void close(Reporter reporter) throws IOException {
         try {
             out.writeBytes("</index>\n");
-        } finally {
+        }
+        finally {
             out.close();
         }
     }
@@ -47,8 +48,10 @@ public class IndexWriter implements RecordWriter<Text, Index> {
 
     private void writeIndex(Index index) throws IOException {
         final String[] terms = index.getTermVector();
-        final String[] urls = index.getDocumentVector();
-        final long[][] freqs = index.getFreqMatrix();
+        final String[] keywords = index.getKeywordVector();
+        final String[] urls = index.getDocumentTermVector();
+        final long[][] termFreqs = index.getTermFreqMatrix();
+        final long[][] keywordFreqs = index.getKeywordFreqMatrix();
         out.writeBytes("<terms n=\"" + terms.length + "\">\n");
         for (int i = 0; i < terms.length; i++) {
             out.writeBytes(terms[i] + ",");
@@ -59,9 +62,14 @@ public class IndexWriter implements RecordWriter<Text, Index> {
             out.writeBytes("<url>");
             out.writeBytes(urls[i]);
             out.writeBytes("</url>");
+            out.writeBytes("<keyword_freq>");
+            for (int j = 0; j < keywords.length; j++) {
+                out.writeBytes(keywordFreqs[i][j] + ",");
+            }
+            out.writeBytes("</keyword_freq>\n");
             out.writeBytes("<term_freq>");
             for (int j = 0; j < terms.length; j++) {
-                out.writeBytes(freqs[i][j] + ",");
+                out.writeBytes(termFreqs[i][j] + ",");
             }
             out.writeBytes("</term_freq>\n");
             out.writeBytes("</document>\n");
