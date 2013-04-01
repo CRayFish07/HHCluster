@@ -117,9 +117,9 @@ public class ParsedDocument implements Writable {
 
     @Override
     public void readFields(DataInput input) throws IOException {
-        url = new Text();
-        terms = new MapWritable();
-        keywords = new MapWritable();
+        url.readFields(input);
+        terms.readFields(input);
+        keywords.readFields(input);
     }
 
     @Override

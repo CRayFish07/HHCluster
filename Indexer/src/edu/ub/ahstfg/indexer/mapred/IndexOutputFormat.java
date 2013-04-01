@@ -1,4 +1,4 @@
-package edu.ub.ahstfg.mapred;
+package edu.ub.ahstfg.indexer.mapred;
 
 import java.io.IOException;
 

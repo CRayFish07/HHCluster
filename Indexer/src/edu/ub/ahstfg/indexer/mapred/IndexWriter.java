@@ -1,4 +1,4 @@
-package edu.ub.ahstfg.mapred;
+package edu.ub.ahstfg.indexer.mapred;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -46,10 +46,10 @@ public class IndexWriter implements RecordWriter<Text, Index> {
     }
 
     private void writeIndex(Index index) throws IOException {
-        String[] terms = index.getTermVector();
-        String[] urls = index.getDocumentVector();
-        long[][] freqs = index.getFreqMatrix();
-        out.writeBytes("<terms>\n");
+        final String[] terms = index.getTermVector();
+        final String[] urls = index.getDocumentVector();
+        final long[][] freqs = index.getFreqMatrix();
+        out.writeBytes("<terms n=\"" + terms.length + "\">\n");
         for (int i = 0; i < terms.length; i++) {
             out.writeBytes(terms[i] + ",");
         }
@@ -59,9 +59,11 @@ public class IndexWriter implements RecordWriter<Text, Index> {
             out.writeBytes("<url>");
             out.writeBytes(urls[i]);
             out.writeBytes("</url>");
+            out.writeBytes("<term_freq>");
             for (int j = 0; j < terms.length; j++) {
                 out.writeBytes(freqs[i][j] + ",");
             }
+            out.writeBytes("</term_freq>\n");
             out.writeBytes("</document>\n");
         }
     }
