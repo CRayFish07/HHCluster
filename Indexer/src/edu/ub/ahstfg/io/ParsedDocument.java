@@ -38,7 +38,8 @@ public class ParsedDocument implements Writable {
     public void addTerm(Text term) {
         if (terms.containsKey(term)) {
             LongWritable n = (LongWritable) terms.get(term);
-            terms.put(term, new LongWritable(n.get() + 1));
+            n.set(n.get() + 1);
+            // terms.put(term, new LongWritable(n.get() + 1));
         } else {
             terms.put(term, ONE());
         }
@@ -93,7 +94,8 @@ public class ParsedDocument implements Writable {
     public void addKeyword(Text keyword) {
         if (keywords.containsKey(keyword)) {
             LongWritable n = (LongWritable) keywords.get(keyword);
-            keywords.put(keyword, new LongWritable(n.get() + 1));
+            n.set(n.get() + 1);
+            // keywords.put(keyword, new LongWritable(n.get() + 1));
         } else {
             keywords.put(keyword, ONE());
         }

@@ -60,6 +60,7 @@ public class IndexerMapper extends MapReduceBase implements
                 word = tokenizer.nextToken();
                 word = word.replaceAll("[^a-zA-Z]", "");
                 pDoc.addTerm(word.toLowerCase().trim());
+                reporter.incrCounter(_counterGroup, "Parsed terms", 1);
             }
 
             Elements metas = doc.getElementsByTag("meta");
@@ -73,7 +74,7 @@ public class IndexerMapper extends MapReduceBase implements
                         for (String keyword : keywords) {
                             pDoc.addKeyword(keyword.toLowerCase().trim());
                             reporter.incrCounter(_counterGroup,
-                                    "Keywords found", 1);
+                                    "Parsed keywords", 1);
                         }
                     }
                 }
