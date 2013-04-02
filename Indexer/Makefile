@@ -86,6 +86,3 @@ run: h_get_output
 
 clean:
 	rm -rf $(JAVA_DIR)
-
-clean:
-	rm -rf $(JAVA_DIR)

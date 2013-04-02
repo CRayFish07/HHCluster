@@ -5,6 +5,8 @@ import java.util.StringTokenizer;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 public class JSoupTesting {
 
@@ -12,7 +14,7 @@ public class JSoupTesting {
      * @param args
      */
     public static void main(String[] args) {
-        String html = "<html><body><p>An <a href='http://example.com/'><b>example</b></a> link.</p></body></html>";
+        String html = "<html><head><meta name=\"keywords\" content=\"test, testing test, testing\"></head><body><p>An <a href='http://example.com/'><b>example</b></a> link.</p></body></html>";
         Document doc = Jsoup.parse(html);
 
         String text = doc.body().text();
@@ -23,6 +25,19 @@ public class JSoupTesting {
             word = tokenizer.nextToken();
             word = word.replaceAll("[^a-zA-Z]", "");
             output.add(word.toLowerCase());
+        }
+
+        Elements metas = doc.getElementsByTag("meta");
+        if (metas != null) {
+            Element meta;
+            String keywords;
+            for (int i = 0; i < metas.size(); i++) {
+                meta = metas.get(i);
+                if (meta.attr("name").equals("keywords")) {
+                    keywords = meta.attr("content");
+                    System.out.println(keywords);
+                }
+            }
         }
 
         for (String s : output) {

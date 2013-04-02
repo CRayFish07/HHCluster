@@ -22,6 +22,7 @@ public class Index implements Writable {
     public Index() {
         terms = new ArrayList<String>();
         termFreq = new HashMap<String, ArrayList<Long>>();
+        keywords = new ArrayList<String>();
         keywordFreq = new HashMap<String, ArrayList<Long>>();
     }
 
