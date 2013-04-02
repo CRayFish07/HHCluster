@@ -29,26 +29,23 @@ public class IndexerReducer extends MapReduceBase implements
 
         ParsedDocument pDoc;
         String url;
-        HashMap<String, Long> termMap;
-        // long iterations = 0, n_iterations = 0;
+        HashMap<String, Long> termMap, keywordMap;
         while (values.hasNext()) {
-            // iterations++;
             pDoc = values.next();
             url = pDoc.getUrl().toString();
             termMap = pDoc.getTermMap();
             if (termMap != null) {
                 for (String term : termMap.keySet()) {
                     index.addTerm(term, url, termMap.get(term));
-                    // n_iterations++;
+                }
+            }
+            keywordMap = pDoc.getKeywordMap();
+            if (keywordMap != null) {
+                for (String keyword : keywordMap.keySet()) {
+                    index.addTerm(keyword, url, keywordMap.get(keyword));
                 }
             }
         }
-
-        // String[] o = index.getTermVector();
-        // reporter.incrCounter("Debug", "Term vector length: ", (long)
-        // o.length);
-        // reporter.incrCounter("Debug", "iterations: ", iterations);
-        // reporter.incrCounter("Debug", "n_iterations: ", n_iterations);
 
         output.collect(new Text("index"), index);
 

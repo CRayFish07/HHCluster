@@ -10,13 +10,15 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 import org.commoncrawl.hadoop.mapred.ArcRecord;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import edu.ub.ahstfg.io.ParsedDocument;
 
 public class IndexerMapper extends MapReduceBase implements
         Mapper<Text, ArcRecord, Text, ParsedDocument> {
 
-    private final String _counterGroup = "Custom Mapper Counters";
+    private final String _counterGroup = "Mapper report";
     private static final Text KEY = new Text("doc");
 
     @Override
@@ -57,7 +59,25 @@ public class IndexerMapper extends MapReduceBase implements
             while (tokenizer.hasMoreTokens()) {
                 word = tokenizer.nextToken();
                 word = word.replaceAll("[^a-zA-Z]", "");
-                pDoc.addTerm(word.toLowerCase());
+                pDoc.addTerm(word.toLowerCase().trim());
+                reporter.incrCounter(_counterGroup, "Parsed terms", 1);
+            }
+
+            Elements metas = doc.getElementsByTag("meta");
+            if (metas != null) {
+                Element meta;
+                String[] keywords;
+                for (int i = 0; i < metas.size(); i++) {
+                    meta = metas.get(i);
+                    if (meta.attr("name").equals("keywords")) {
+                        keywords = meta.attr("content").split(",");
+                        for (String keyword : keywords) {
+                            pDoc.addKeyword(keyword.toLowerCase().trim());
+                            reporter.incrCounter(_counterGroup,
+                                    "Parsed keywords", 1);
+                        }
+                    }
+                }
             }
 
             output.collect(KEY, pDoc);
