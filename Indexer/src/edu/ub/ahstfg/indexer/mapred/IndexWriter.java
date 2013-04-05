@@ -51,34 +51,34 @@ public class IndexWriter implements RecordWriter<Text, Index> {
         final String[] urls = index.getDocumentTermVector();
         final long[][] termFreqs = index.getTermFreqMatrix();
         final long[][] keywordFreqs = index.getKeywordFreqMatrix();
-        out.writeBytes("<keywords n=\"" + keywords.length + "\">\n");
+        out.writeBytes("  <keywords n=\"" + keywords.length + "\">\n    ");
         for (int i = 0; i < keywords.length; i++) {
             out.writeBytes(keywords[i] + ",");
         }
-        out.writeBytes("</keywords>\n");
-        out.writeBytes("<terms n=\"" + terms.length + "\">\n");
+        out.writeBytes("\n  </keywords>\n");
+        out.writeBytes("  <terms n=\"" + terms.length + "\">\n    ");
         for (int i = 0; i < terms.length; i++) {
             out.writeBytes(terms[i] + ",");
         }
-        out.writeBytes("</terms>\n");
+        out.writeBytes("\n  </terms>\n");
         for (int i = 0; i < urls.length; i++) {
-            out.writeBytes("<document>\n");
-            out.writeBytes("<url>");
+            out.writeBytes("  <document>\n");
+            out.writeBytes("    <url>\n      ");
             out.writeBytes(urls[i]);
-            out.writeBytes("</url>");
-            out.writeBytes("<keyword_freq>");
+            out.writeBytes("\n    </url>\n");
+            out.writeBytes("    <keyword_freq>\n      ");
             if (keywords != null) {
                 for (int j = 0; j < keywords.length; j++) {
                     out.writeBytes(keywordFreqs[i][j] + ",");
                 }
             }
-            out.writeBytes("</keyword_freq>\n");
-            out.writeBytes("<term_freq>");
+            out.writeBytes("\n    </keyword_freq>\n");
+            out.writeBytes("    <term_freq>\n      ");
             for (int j = 0; j < terms.length; j++) {
                 out.writeBytes(termFreqs[i][j] + ",");
             }
-            out.writeBytes("</term_freq>\n");
-            out.writeBytes("</document>\n");
+            out.writeBytes("\n    </term_freq>\n");
+            out.writeBytes("  </document>\n");
         }
     }
 
