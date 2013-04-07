@@ -117,16 +117,6 @@ public class Index implements Writable {
         return keywords.toArray(new String[keywords.size()]);
     }
 
-    public String[] getDocumentKeywordVector() {
-        String[] ret = new String[keywordFreq.size()];
-        int i = 0;
-        for (String url : keywordFreq.keySet()) {
-            ret[i] = url;
-            i++;
-        }
-        return ret;
-    }
-
     public long[][] getKeywordFreqMatrix() {
         long[][] ret = new long[keywordFreq.size()][keywords.size()];
         int i = 0, j = 0;

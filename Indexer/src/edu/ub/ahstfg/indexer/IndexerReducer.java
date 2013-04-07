@@ -10,15 +10,18 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
+import edu.ub.ahstfg.io.DocumentDescriptor;
+import edu.ub.ahstfg.io.FeatureDescriptor;
 import edu.ub.ahstfg.io.Index;
+import edu.ub.ahstfg.io.IndexRecord;
 import edu.ub.ahstfg.io.ParsedDocument;
 
 public class IndexerReducer extends MapReduceBase implements
-        Reducer<Text, ParsedDocument, Text, Index> {
+        Reducer<Text, ParsedDocument, Text, IndexRecord> {
 
     @Override
     public void reduce(Text key, Iterator<ParsedDocument> values,
-            OutputCollector<Text, Index> output, Reporter reporter)
+            OutputCollector<Text, IndexRecord> output, Reporter reporter)
             throws IOException {
 
         if (values == null) {
@@ -47,7 +50,18 @@ public class IndexerReducer extends MapReduceBase implements
             }
         }
 
-        output.collect(new Text("index"), index);
+        String[] terms = index.getTermVector();
+        String[] keywords = index.getKeywordVector();
+        FeatureDescriptor fd = new FeatureDescriptor(terms, keywords);
+        output.collect(new Text("<<<FeatureDescriptor>>>"), fd);
+
+        String[] urls = index.getDocumentTermVector();
+        long[][] termFreq = index.getTermFreqMatrix();
+        long[][] keyFreq = index.getKeywordFreqMatrix();
+        for (int i = 0; i < urls.length; i++) {
+            output.collect(new Text(urls[i]), new DocumentDescriptor(urls[i],
+                    termFreq[i], keyFreq[i]));
+        }
 
     }
 }
