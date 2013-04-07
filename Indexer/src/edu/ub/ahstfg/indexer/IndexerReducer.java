@@ -57,10 +57,10 @@ public class IndexerReducer extends MapReduceBase implements
 
         String[] urls = index.getDocumentTermVector();
         long[][] termFreq = index.getTermFreqMatrix();
-        long[][] keyFreq = index.getKeywordFreqMatrix();
+        // long[][] keyFreq = index.getKeywordFreqMatrix();
         for (int i = 0; i < urls.length; i++) {
             output.collect(new Text(urls[i]), new DocumentDescriptor(urls[i],
-                    termFreq[i], keyFreq[i]));
+                    termFreq[i]/* , keyFreq[i] */));
         }
 
     }

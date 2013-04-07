@@ -52,7 +52,7 @@ public class IndexRecordWriter implements RecordWriter<Text, IndexRecord> {
             FeatureDescriptor features = (FeatureDescriptor) value;
             String[] keywords = features.getKeywords();
             String[] terms = features.getTerms();
-            out.writeBytes("<features>");
+            out.writeBytes("<features>\n");
             if (keywords != null) {
                 out.writeBytes("  <keywords>\n");
                 for (int i = 0; i < keywords.length; i++) {
@@ -65,7 +65,7 @@ public class IndexRecordWriter implements RecordWriter<Text, IndexRecord> {
                 out.writeBytes(terms[i] + ",");
             }
             out.writeBytes("  </terms>\n");
-            out.writeBytes("</features>");
+            out.writeBytes("</features>\n");
         }
     }
 }
