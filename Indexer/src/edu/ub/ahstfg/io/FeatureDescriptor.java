@@ -28,6 +28,14 @@ public class FeatureDescriptor implements IndexRecord, Writable {
         return IndexRecord.FEATURE;
     }
 
+    public String[] getTerms() {
+        return terms;
+    }
+
+    public String[] getKeywords() {
+        return keywords;
+    }
+
     @Override
     public void readFields(DataInput input) throws IOException {
         ArrayWritable buffer = new ArrayWritable(Text.class);

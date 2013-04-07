@@ -32,6 +32,18 @@ public class DocumentDescriptor implements IndexRecord, Writable {
         return IndexRecord.DOCUMENT;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public long[] getTermFreq() {
+        return termFreq;
+    }
+
+    public long[] getKeyFreq() {
+        return keyFreq;
+    }
+
     @Override
     public void readFields(DataInput input) throws IOException {
         Text t = new Text();
