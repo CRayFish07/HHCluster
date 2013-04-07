@@ -11,6 +11,7 @@ import org.apache.hadoop.mapred.Reporter;
 
 import edu.ub.ahstfg.io.Index;
 
+@Deprecated
 public class IndexWriter implements RecordWriter<Text, Index> {
 
     private DataOutputStream out;

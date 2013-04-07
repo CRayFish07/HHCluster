@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 import org.commoncrawl.hadoop.mapred.ArcInputFormat;
 
 import edu.ub.ahstfg.indexer.mapred.IndexOutputFormat;
-import edu.ub.ahstfg.io.Index;
+import edu.ub.ahstfg.io.IndexRecord;
 import edu.ub.ahstfg.io.ParsedDocument;
 
 public class Indexer extends Configured implements Tool {
@@ -62,7 +62,7 @@ public class Indexer extends Configured implements Tool {
 
         LOG.info("Setting output data types.");
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Index.class);
+        job.setOutputValueClass(IndexRecord.class);
 
         LOG.info("Setting mapper and reducer.");
         // job.setMapperClass(WordCountTextInputMapper.class);

@@ -28,18 +28,28 @@ public class DocumentDescriptor implements IndexRecord, Writable {
     }
 
     @Override
+    public boolean isDocument() {
+        return IndexRecord.DOCUMENT;
+    }
+
+    @Override
     public void readFields(DataInput input) throws IOException {
         Text t = new Text();
         t.readFields(input);
         url = t.toString();
         ArrayWritable buffer = new ArrayWritable(LongWritable.class);
         buffer.readFields(input);
-
+        termFreq = WritableConverter.arrayWritable2LongArray(buffer);
+        buffer = new ArrayWritable(LongWritable.class);
+        buffer.readFields(input);
+        keyFreq = WritableConverter.arrayWritable2LongArray(buffer);
     }
 
     @Override
     public void write(DataOutput output) throws IOException {
-
+        new Text(url).write(output);
+        WritableConverter.longArray2ArrayWritable(termFreq).write(output);
+        WritableConverter.longArray2ArrayWritable(keyFreq).write(output);
     }
 
 }
