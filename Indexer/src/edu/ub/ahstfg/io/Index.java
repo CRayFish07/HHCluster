@@ -117,14 +117,18 @@ public class Index implements Writable {
     }
 
     public long[][] getKeywordFreqMatrix() {
-        long[][] ret = new long[keywordFreq.size()][keywords.size()];
+        long[][] ret = new long[termFreq.size()][terms.size()];
         int i = 0, j = 0;
         ArrayList<Long> freqs;
-        for (String url : keywordFreq.keySet()) {
+        for (String url : termFreq.keySet()) {
             freqs = keywordFreq.get(url);
-            for (int k = 0; k < keywords.size(); k++) {
-                ret[i][j] = freqs.get(j);
-                j++;
+            if (freqs != null) {
+                for (int k = 0; k < keywords.size(); k++) {
+                    ret[i][j] = freqs.get(j);
+                    j++;
+                }
+            } else {
+                ret[i] = new long[] { -1 };
             }
             i++;
             j = 0;

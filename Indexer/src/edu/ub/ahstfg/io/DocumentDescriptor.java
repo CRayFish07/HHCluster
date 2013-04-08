@@ -21,11 +21,11 @@ public class DocumentDescriptor implements IndexRecord, Writable {
         keyFreq = new long[1];
     }
 
-    public DocumentDescriptor(String url, long[] termFreq/* , long[] keyFreq */) {
+    public DocumentDescriptor(String url, long[] termFreq, long[] keyFreq) {
         this.url = url;
         this.termFreq = termFreq;
-        this.keyFreq = null;
-        // this.keyFreq = keyFreq;
+        // this.keyFreq = null;
+        this.keyFreq = keyFreq;
     }
 
     @Override
