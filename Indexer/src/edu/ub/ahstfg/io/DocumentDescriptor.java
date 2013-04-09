@@ -2,6 +2,7 @@ package edu.ub.ahstfg.io;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.hadoop.io.ArrayWritable;
@@ -63,6 +64,23 @@ public class DocumentDescriptor implements IndexRecord, Writable {
         new Text(url).write(output);
         WritableConverter.longArray2ArrayWritable(termFreq).write(output);
         WritableConverter.longArray2ArrayWritable(keyFreq).write(output);
+    }
+
+    @Override
+    public void writeOutput(DataOutputStream out) throws IOException {
+        out.writeBytes(url + "\t");
+        if (keyFreq != null) {
+            out.writeBytes("keywords:");
+            for (int i = 0; i < keyFreq.length; i++) {
+                out.writeBytes(keyFreq[i] + ",");
+            }
+            out.writeBytes(";");
+        }
+        out.writeBytes("terms:");
+        for (int i = 0; i < termFreq.length; i++) {
+            out.writeBytes(termFreq[i] + ",");
+        }
+        out.writeBytes(".\n");
     }
 
 }

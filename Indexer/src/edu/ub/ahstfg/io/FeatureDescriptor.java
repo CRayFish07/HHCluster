@@ -2,6 +2,7 @@ package edu.ub.ahstfg.io;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.hadoop.io.ArrayWritable;
@@ -50,6 +51,23 @@ public class FeatureDescriptor implements IndexRecord, Writable {
     public void write(DataOutput output) throws IOException {
         WritableConverter.stringArray2ArrayWritable(terms).write(output);
         WritableConverter.stringArray2ArrayWritable(keywords).write(output);
+    }
+
+    @Override
+    public void writeOutput(DataOutputStream out) throws IOException {
+        out.writeBytes("<<<FeatureDescriptor>>>\t");
+        if (keywords != null) {
+            out.writeBytes("keywords:");
+            for (int i = 0; i < keywords.length; i++) {
+                out.writeBytes(keywords[i] + ",");
+            }
+            out.writeBytes(";");
+        }
+        out.writeBytes("terms:");
+        for (int i = 0; i < terms.length; i++) {
+            out.writeBytes(terms[i] + ",");
+        }
+        out.writeBytes(".\n");
     }
 
 }
