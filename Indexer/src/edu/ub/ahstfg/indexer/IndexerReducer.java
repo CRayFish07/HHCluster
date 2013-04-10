@@ -10,11 +10,11 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
-import edu.ub.ahstfg.io.DocumentDescriptor;
-import edu.ub.ahstfg.io.FeatureDescriptor;
-import edu.ub.ahstfg.io.Index;
-import edu.ub.ahstfg.io.IndexRecord;
-import edu.ub.ahstfg.io.ParsedDocument;
+import edu.ub.ahstfg.io.document.ParsedDocument;
+import edu.ub.ahstfg.io.index.DocumentDescriptor;
+import edu.ub.ahstfg.io.index.FeatureDescriptor;
+import edu.ub.ahstfg.io.index.Index;
+import edu.ub.ahstfg.io.index.IndexRecord;
 
 public class IndexerReducer extends MapReduceBase implements
         Reducer<Text, ParsedDocument, Text, IndexRecord> {

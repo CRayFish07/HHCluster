@@ -7,7 +7,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.RecordWriter;
 import org.apache.hadoop.mapred.Reporter;
 
-import edu.ub.ahstfg.io.IndexRecord;
+import edu.ub.ahstfg.io.index.IndexRecord;
 
 public class IndexRecordWriter implements RecordWriter<Text, IndexRecord> {
 

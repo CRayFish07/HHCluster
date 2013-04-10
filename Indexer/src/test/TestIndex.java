@@ -1,6 +1,6 @@
 package test;
 
-import edu.ub.ahstfg.io.Index;
+import edu.ub.ahstfg.io.index.Index;
 
 public class TestIndex {
 

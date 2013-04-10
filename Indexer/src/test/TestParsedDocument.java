@@ -2,7 +2,7 @@ package test;
 
 import java.util.HashMap;
 
-import edu.ub.ahstfg.io.ParsedDocument;
+import edu.ub.ahstfg.io.document.ParsedDocument;
 
 public class TestParsedDocument {
 

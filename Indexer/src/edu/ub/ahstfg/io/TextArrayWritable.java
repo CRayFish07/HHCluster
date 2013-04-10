@@ -3,6 +3,7 @@ package edu.ub.ahstfg.io;
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.Text;
 
+@Deprecated
 public class TextArrayWritable extends ArrayWritable {
 
     public TextArrayWritable() {

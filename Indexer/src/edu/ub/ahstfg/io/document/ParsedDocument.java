@@ -1,4 +1,4 @@
-package edu.ub.ahstfg.io;
+package edu.ub.ahstfg.io.document;
 
 import java.io.DataInput;
 import java.io.DataOutput;

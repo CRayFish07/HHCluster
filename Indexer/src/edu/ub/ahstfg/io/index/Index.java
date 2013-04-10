@@ -1,4 +1,4 @@
-package edu.ub.ahstfg.io;
+package edu.ub.ahstfg.io.index;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -10,6 +10,8 @@ import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+
+import edu.ub.ahstfg.io.WritableConverter;
 
 public class Index implements Writable {
 

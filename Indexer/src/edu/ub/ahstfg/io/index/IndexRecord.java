@@ -1,9 +1,11 @@
-package edu.ub.ahstfg.io;
+package edu.ub.ahstfg.io.index;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public interface IndexRecord {
+import org.apache.hadoop.io.Writable;
+
+public interface IndexRecord extends Writable {
 
     public static final boolean DOCUMENT = true;
     public static final boolean FEATURE = false;

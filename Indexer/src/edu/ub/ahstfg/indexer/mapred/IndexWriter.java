@@ -9,7 +9,7 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.RecordWriter;
 import org.apache.hadoop.mapred.Reporter;
 
-import edu.ub.ahstfg.io.Index;
+import edu.ub.ahstfg.io.index.Index;
 
 @Deprecated
 public class IndexWriter implements RecordWriter<Text, Index> {

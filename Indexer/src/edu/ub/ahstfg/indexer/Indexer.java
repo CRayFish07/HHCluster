@@ -17,8 +17,8 @@ import org.apache.log4j.Logger;
 import org.commoncrawl.hadoop.mapred.ArcInputFormat;
 
 import edu.ub.ahstfg.indexer.mapred.IndexOutputFormat;
-import edu.ub.ahstfg.io.IndexRecord;
-import edu.ub.ahstfg.io.ParsedDocument;
+import edu.ub.ahstfg.io.document.ParsedDocument;
+import edu.ub.ahstfg.io.index.IndexRecord;
 
 public class Indexer extends Configured implements Tool {
 

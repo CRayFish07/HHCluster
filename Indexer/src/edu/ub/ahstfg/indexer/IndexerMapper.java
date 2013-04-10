@@ -13,7 +13,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import edu.ub.ahstfg.io.ParsedDocument;
+import edu.ub.ahstfg.io.document.ParsedDocument;
 
 public class IndexerMapper extends MapReduceBase implements
         Mapper<Text, ArcRecord, Text, ParsedDocument> {

@@ -11,7 +11,7 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RecordWriter;
 import org.apache.hadoop.util.Progressable;
 
-import edu.ub.ahstfg.io.IndexRecord;
+import edu.ub.ahstfg.io.index.IndexRecord;
 
 public class IndexOutputFormat extends FileOutputFormat<Text, IndexRecord> {
 
