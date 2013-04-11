@@ -21,7 +21,7 @@ public class IndexOutputFormat extends FileOutputFormat<Text, IndexRecord> {
         Path file = FileOutputFormat.getTaskOutputPath(job, name);
         FileSystem fs = file.getFileSystem(job);
         FSDataOutputStream fileOut = fs.create(file, progress);
-        return new IndexRecordWriter(fileOut);
+        return new IndexRecordWriter(job, fileOut);
     }
 
 }
