@@ -1,5 +1,10 @@
 package edu.ub.ahstfg.utils;
 
+import java.io.IOException;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+
 public class Utils {
 
     public static String[] trimStringArray(String[] array) {
@@ -16,4 +21,11 @@ public class Utils {
         }
         return ret;
     }
+
+    public static FileSystem accessHDFS(String host) throws IOException {
+        Configuration config = new Configuration();
+        config.set("fs.default.name", host);
+        return FileSystem.get(config);
+    }
+
 }
