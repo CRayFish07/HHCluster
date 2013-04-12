@@ -7,6 +7,8 @@ import org.apache.hadoop.fs.FileSystem;
 
 public class Utils {
 
+    public static final String HDFS_HOST = "hdfs://localhost:9000/";
+
     public static String[] trimStringArray(String[] array) {
         for (int i = 0; i < array.length; i++) {
             array[i] = array[i].trim();
@@ -26,6 +28,10 @@ public class Utils {
         Configuration config = new Configuration();
         config.set("fs.default.name", host);
         return FileSystem.get(config);
+    }
+
+    public static FileSystem accessHDFS() throws IOException {
+        return accessHDFS(HDFS_HOST);
     }
 
 }
