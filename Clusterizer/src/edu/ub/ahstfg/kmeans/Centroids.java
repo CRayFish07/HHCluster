@@ -7,30 +7,36 @@ import org.apache.hadoop.fs.Path;
 import edu.ub.ahstfg.kmeans.document.DocumentCentroid;
 
 public class Centroids {
-
+    
     public static final String CENTROIDS_DIR_PREFIX = "./centroids_";
     public static final String CENTROIDS_FILE_PREFIX = "/centroid_";
-
+    
     private int K;
     private Centroid[] centroids;
-
-    public Centroids(int K) {
+    
+    private Class<? extends Centroid> centroidClass;
+    
+    public Centroids(int K, Class<? extends Centroid> centroidClass) {
         this.K = K;
+        this.centroidClass = centroidClass;
         centroids = new Centroid[K];
     }
-
+    
     public Centroid get(int i) {
         return centroids[i];
     }
-
-    public void randomInit() {
-        // TODO Auto-generated method stub
+    
+    public void randomDocumentInit(int keywords, int terms) {
+        for (int i = 0; i < centroids.length; i++) {
+            centroids[i] = new DocumentCentroid(DocumentCentroid.RANDOM,
+                    keywords, terms);
+        }
     }
-
+    
     public boolean isFinished() {
         return false;
     }
-
+    
     public void toHDFS(String dir) throws IOException {
         int i = 0;
         for (Centroid c : centroids) {
@@ -38,10 +44,17 @@ public class Centroids {
             i++;
         }
     }
-
-    public void fromHDFS(String dir) throws IOException {
+    
+    public void fromHDFS(String dir)
+            throws IOException {
         for (int i = 0; i < K; i++) {
-            centroids[i] = new DocumentCentroid();
+            try {
+                centroids[i] = centroidClass.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
             centroids[i].fromHDFS(new Path(dir + CENTROIDS_FILE_PREFIX
                     + String.valueOf(i)));
         }

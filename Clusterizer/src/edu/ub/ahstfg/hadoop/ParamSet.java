@@ -15,7 +15,7 @@ public class ParamSet {
     }
 
     public void setParam(String name, String value) {
-
+        properties.setProperty(name, value);
     }
 
     public void setJobParam(String name, String value) {
