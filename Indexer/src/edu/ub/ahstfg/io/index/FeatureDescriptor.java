@@ -5,41 +5,47 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.Text;
 
 import edu.ub.ahstfg.io.WritableConverter;
+import edu.ub.ahstfg.utils.Utils;
 
 public class FeatureDescriptor implements IndexRecord {
-
+    
     public static final String KEY = "<<<FeatureDescriptor>>>";
-
+    public static final String NUM_FEATURES_PATH = "n_features/n_features";
+    
     private String[] terms;
     private String[] keywords;
-
+    
     public FeatureDescriptor() {
         terms = new String[1];
         keywords = new String[1];
     }
-
+    
     public FeatureDescriptor(String[] terms, String[] keywords) {
         this.terms = terms;
         this.keywords = keywords;
     }
-
+    
     @Override
     public boolean isDocument() {
         return IndexRecord.FEATURE;
     }
-
+    
     public String[] getTerms() {
         return terms;
     }
-
+    
     public String[] getKeywords() {
         return keywords;
     }
-
+    
     @Override
     public void readFields(DataInput input) throws IOException {
         ArrayWritable buffer = new ArrayWritable(Text.class);
@@ -49,15 +55,16 @@ public class FeatureDescriptor implements IndexRecord {
         buffer.readFields(input);
         keywords = WritableConverter.arrayWritable2StringArray(buffer);
     }
-
+    
     @Override
     public void write(DataOutput output) throws IOException {
         WritableConverter.stringArray2ArrayWritable(terms).write(output);
         WritableConverter.stringArray2ArrayWritable(keywords).write(output);
     }
-
+    
     @Override
     public void writeOutput(DataOutputStream out) throws IOException {
+        writeNumFeatures();
         out.writeBytes(KEY + "\t");
         if (keywords != null) {
             out.writeBytes("keywords:");
@@ -71,5 +78,24 @@ public class FeatureDescriptor implements IndexRecord {
             out.writeBytes(terms[i] + ",");
         }
     }
-
+    
+    public void writeNumFeatures() throws IOException {
+        FileSystem fs = Utils.accessHDFS();
+        FSDataOutputStream out = fs.create(new Path(NUM_FEATURES_PATH));
+        out.writeInt(keywords.length);
+        out.writeInt(terms.length);
+        out.close(); fs.close();
+    }
+    
+    public static void getNumFeatures(int[] features)
+            throws IllegalArgumentException, IOException {
+        if(features.length != 2) {
+            throw new IllegalArgumentException();
+        }
+        FileSystem fs = Utils.accessHDFS();
+        FSDataInputStream in = fs.open(new Path(NUM_FEATURES_PATH));
+        features[0] = in.readInt();
+        features[1] = in.readInt();
+    }
+    
 }

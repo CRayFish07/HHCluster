@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import edu.ub.ahstfg.hadoop.ParamSet;
+import edu.ub.ahstfg.io.index.FeatureDescriptor;
 import edu.ub.ahstfg.kmeans.Centroids;
 import edu.ub.ahstfg.kmeans.KmeansIteration;
 import edu.ub.ahstfg.kmeans.document.DocumentCentroid;
@@ -20,10 +21,14 @@ public class Clusterizer {
     private int nIter;
     private boolean finish;
     
-    public Clusterizer(int K) {
+    public Clusterizer(int K) throws IOException {
         params = new ParamSet();
         centroids = new Centroids(K, DocumentCentroid.class);
-        // TODO centroids.randomDocumentInit();
+        
+        int[] nFeatures = new int[2];
+        FeatureDescriptor.getNumFeatures(nFeatures);
+        centroids.randomDocumentInit(nFeatures[0], nFeatures[1]);
+        
         nIter = 0;
         finish = false;
     }

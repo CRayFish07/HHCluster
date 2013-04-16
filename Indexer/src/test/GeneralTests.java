@@ -4,10 +4,12 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
 
+import edu.ub.ahstfg.io.index.FeatureDescriptor;
+import edu.ub.ahstfg.io.index.Index;
 import edu.ub.ahstfg.utils.Utils;
 
 public class GeneralTests {
-
+    
     public GeneralTests() {
         MapWritable map = new MapWritable();
         Text key = new Text("key");
@@ -15,9 +17,9 @@ public class GeneralTests {
         LongWritable value = (LongWritable) map.get(key);
         value.set(2);
         System.out.println(map.get(key));
-
+        
         System.out.println("--------------------------------------------");
-
+        
         String str = "        hola \t   1, ke,     ase,,,,";
         String[] split = str.split("\t");
         Utils.trimStringArray(split);
@@ -33,10 +35,16 @@ public class GeneralTests {
                 }
             }
         }
+        
+        Index idx = new Index();
+        String[] keywords = idx.getKeywordVector();
+        String[] terms = idx.getTermVector();
+        FeatureDescriptor fd = new FeatureDescriptor(terms, keywords);
+        System.out.println("");
     }
-
+    
     public static void main(String[] args) {
         new GeneralTests();
     }
-
+    
 }
