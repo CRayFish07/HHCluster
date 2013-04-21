@@ -30,11 +30,12 @@ public class KmeansIteration extends Configured implements Tool {
     private String inputPath;
     private String outputPath;
     
-    public KmeansIteration(int nIter, String inputPath, String outputPath) {
+    public KmeansIteration(int nIter, String inputPath, String outputPath, ParamSet args) {
         this.nIter = nIter;
         job = new JobConf(getConf());
         this.inputPath = inputPath;
         this.outputPath = outputPath;
+        args.toJobConf(job);
     }
     
     @Override
@@ -86,7 +87,7 @@ public class KmeansIteration extends Configured implements Tool {
         int res;
         try {
             res = ToolRunner.run(new Configuration(), new KmeansIteration(
-                    nIter, inputPath, outputPath), new String[1]);
+                    nIter, inputPath, outputPath, args), new String[1]);
         } catch (Exception e) {
             LOG.error(e.getMessage());
             res = -1;
