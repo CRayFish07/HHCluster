@@ -3,6 +3,7 @@ package edu.ub.ahstfg.kmeans.document;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -91,6 +92,30 @@ public class DocumentCentroid implements Centroid, Writable {
         FSDataInputStream in = fs.open(path);
         readFields(in);
         fs.close();
+    }
+    
+    public static DocumentCentroid calculateCentroid(int nKeywords, int nTerms,
+            ArrayList<long[]>keys, ArrayList<long[]> terms) {
+        long[] keyFreq  = new long[nKeywords];
+        long sum;
+        for(int j = 0; j < nKeywords; j++) {
+            sum = 0;
+            for(int i = 0; i < keys.size(); i++) {
+                sum += keys.get(i)[j];
+            }
+            keyFreq[j] = sum / keys.size();
+        }
+        
+        long[] termFreq = new long[nTerms];
+        for(int j = 0; j < nTerms; j++) {
+            sum = 0;
+            for(int i = 0; i < terms.size(); i++) {
+                sum += terms.get(i)[j];
+            }
+            termFreq[j] = sum / terms.size();
+        }
+        
+        return new DocumentCentroid(keyFreq, termFreq);
     }
     
 }
