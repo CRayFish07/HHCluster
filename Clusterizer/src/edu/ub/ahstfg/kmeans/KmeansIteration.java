@@ -16,6 +16,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
+import edu.ub.ahstfg.hadoop.ParamSet;
 import edu.ub.ahstfg.indexer.mapred.IndexInputFormat;
 import edu.ub.ahstfg.io.document.ParsedDocument;
 
@@ -81,11 +82,11 @@ public class KmeansIteration extends Configured implements Tool {
     }
     
     public static int runIteration(int nIter, String inputPath,
-            String outputPath, String[] args) {
+            String outputPath, ParamSet args) {
         int res;
         try {
             res = ToolRunner.run(new Configuration(), new KmeansIteration(
-                    nIter, inputPath, outputPath), args);
+                    nIter, inputPath, outputPath), new String[1]);
         } catch (Exception e) {
             LOG.error(e.getMessage());
             res = -1;
