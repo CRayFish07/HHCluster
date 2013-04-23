@@ -6,6 +6,7 @@ import org.apache.hadoop.mapred.JobConf;
 
 public class ParamSet {
     
+    // Param keys
     public static final String OLD_CENTROIDS_PATH  = "old_centroids_path";
     public static final String NEW_CENTROIDS_PATH  = "new_centroids_path";
     public static final String K                   = "K";
@@ -13,6 +14,8 @@ public class ParamSet {
     public static final String NUM_TERMS           = "nTerms";
     public static final String WEIGHT_KEYWORDS     = "wKeywords";
     public static final String WEIGHT_TERMS        = "wTerms";
+    
+    // Param default values
     public static final String INPUT_PATH          = "kmeans_input";
     public static final String OUTPUT_PATH         = "kmeans_output";
     
