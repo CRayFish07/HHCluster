@@ -68,7 +68,7 @@ Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
                 } else {
                     keywordDistance = 0.0;
                 }
-                docDistance = wKeywords * keywordDistance + wTerms + termDistance;
+                docDistance = wKeywords * keywordDistance + wTerms * termDistance;
                 if(finalDistance < 0 || finalDistance > docDistance) {
                     finalDistance = docDistance;
                     finalCentroid = iCentroid;

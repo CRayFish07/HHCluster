@@ -36,6 +36,7 @@ public class KmeansIteration extends Configured implements Tool {
         this.inputPath = inputPath;
         this.outputPath = outputPath;
         args.toJobConf(job);
+        job.setInt(ParamSet.N_ITERATION, nIter);
     }
     
     @Override

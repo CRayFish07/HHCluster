@@ -10,12 +10,14 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.ArrayWritable;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.log4j.Logger;
 
 import edu.ub.ahstfg.io.WritableConverter;
 import edu.ub.ahstfg.kmeans.Centroid;
+import edu.ub.ahstfg.utils.Metrics;
 import edu.ub.ahstfg.utils.Utils;
 
 public class DocumentCentroid implements Centroid, Writable {
@@ -25,8 +27,10 @@ public class DocumentCentroid implements Centroid, Writable {
     public static final boolean RANDOM           = true;
     public static final int     RANDOM_MAX_RANGE = 100;
     
-    public long[] keywordVector;
-    public long[] termVector;
+    private long[] keywordVector;
+    private long[] termVector;
+    
+    private double distance; //distance from previous centroid
     
     public DocumentCentroid() {
         this(10, 10);
@@ -42,6 +46,7 @@ public class DocumentCentroid implements Centroid, Writable {
                 termVector[i] = Utils.randomIntRange(0, RANDOM_MAX_RANGE);
             }
         }
+        distance = 0.0;
     }
     
     public DocumentCentroid(int keywords, int terms) {
@@ -63,9 +68,21 @@ public class DocumentCentroid implements Centroid, Writable {
     }
     
     @Override
+    public double getDistance() {
+        return distance;
+    }
+    
+    @Override
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
+    
+    @Override
     public void write(DataOutput out) throws IOException {
         WritableConverter.longArray2ArrayWritable(keywordVector).write(out);
         WritableConverter.longArray2ArrayWritable(termVector).write(out);
+        DoubleWritable dist = new DoubleWritable(distance);
+        dist.write(out);
     }
     
     @Override
@@ -76,6 +93,9 @@ public class DocumentCentroid implements Centroid, Writable {
         ArrayWritable t = new ArrayWritable(LongWritable.class);
         t.readFields(in);
         termVector = WritableConverter.arrayWritable2LongArray(t);
+        DoubleWritable dist = new DoubleWritable();
+        dist.readFields(in);
+        distance = dist.get();
     }
     
     @Override
@@ -92,6 +112,14 @@ public class DocumentCentroid implements Centroid, Writable {
         FSDataInputStream in = fs.open(path);
         readFields(in);
         fs.close();
+    }
+    
+    public double distance(DocumentCentroid other, float wk, float wt) {
+        double keyDistance = Metrics.euclideanDistance(keywordVector,
+                other.keywordVector);
+        double termDistance = Metrics.euclideanDistance(termVector,
+                other.termVector);
+        return wk * keyDistance + wt * termDistance;
     }
     
     public static DocumentCentroid calculateCentroid(int nKeywords, int nTerms,

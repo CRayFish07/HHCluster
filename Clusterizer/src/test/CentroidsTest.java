@@ -31,9 +31,9 @@ public class CentroidsTest {
             e.printStackTrace();
         }
         DocumentCentroid dc1 = (DocumentCentroid) centroids.get(1);
-        LOG.info("Centroid 1, position 1 = " + dc1.keywordVector[1]);
-        LOG.info("Centroid 1, position 2 = " + dc1.keywordVector[2]);
-        LOG.info("Centroid 1, position 3 = " + dc1.keywordVector[3]);
+        LOG.info("Centroid 1, position 1 = " + dc1.getKeywordVector()[1]);
+        LOG.info("Centroid 1, position 2 = " + dc1.getKeywordVector()[2]);
+        LOG.info("Centroid 1, position 3 = " + dc1.getKeywordVector()[3]);
         
         LOG.info("Reading centroids from HDFS...");
         Centroids centroids2 = new Centroids(K, DocumentCentroid.class);
@@ -44,9 +44,9 @@ public class CentroidsTest {
             e.printStackTrace();
         }
         DocumentCentroid dc2 = (DocumentCentroid) centroids2.get(1);
-        LOG.info("Centroid 1, position 1 = " + dc2.keywordVector[1]);
-        LOG.info("Centroid 1, position 2 = " + dc2.keywordVector[2]);
-        LOG.info("Centroid 1, position 3 = " + dc2.keywordVector[3]);
+        LOG.info("Centroid 1, position 1 = " + dc2.getKeywordVector()[1]);
+        LOG.info("Centroid 1, position 2 = " + dc2.getKeywordVector()[2]);
+        LOG.info("Centroid 1, position 3 = " + dc2.getKeywordVector()[3]);
         LOG.info("DONE!");
     }
     

@@ -8,7 +8,7 @@ import edu.ub.ahstfg.kmeans.document.DocumentCentroid;
 
 public class Centroids {
     
-    public static final String CENTROIDS_DIR_PREFIX = "./centroids_";
+    public static final String CENTROIDS_DIR_PREFIX  = "./centroids_";
     public static final String CENTROIDS_FILE_PREFIX = "/centroid_";
     
     private int K;
@@ -34,7 +34,12 @@ public class Centroids {
     }
     
     public boolean isFinished() {
-        return false;
+        for(Centroid c: centroids) {
+            if(c.getDistance() != 0.0) {
+                return false;
+            }
+        }
+        return true;
     }
     
     public void toHDFS(String dir) throws IOException {

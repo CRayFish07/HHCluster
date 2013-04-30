@@ -34,7 +34,7 @@ Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
                     throws IOException {
         int nKeywords = job.getInt(ParamSet.NUM_KEYWORDS, 0);
         int nTerms    = job.getInt(ParamSet.NUM_TERMS   , 0);
-        boolean haveKeywords = nKeywords > 0;
+        //boolean haveKeywords = nKeywords > 0;
         
         DocumentDistance d;
         ArrayList<long[]> keys = new ArrayList<long[]>();
@@ -48,9 +48,21 @@ Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
             output.collect(new Text(doc.getUrl()), key);
         }
         
-        DocumentCentroid newCentroid = DocumentCentroid.calculateCentroid(nKeywords,
-                nTerms, keys, terms);
-        newCentroid.toHDFS(new Path(job.get(job.get(ParamSet.NEW_CENTROIDS_PATH))));
+        DocumentCentroid newCentroid = DocumentCentroid.calculateCentroid(
+                nKeywords, nTerms, keys, terms);
+        
+        String centroidPath = Centroids.CENTROIDS_FILE_PREFIX + String.valueOf(key.get());
+        // calculate distance with old centroid --------------------------------
+        String oldPath = job.get(ParamSet.OLD_CENTROIDS_PATH) + centroidPath;
+        DocumentCentroid oldCentroid = new DocumentCentroid();
+        oldCentroid.fromHDFS(new Path(oldPath));
+        double distance = newCentroid.distance(oldCentroid,
+                job.getFloat(job.get(ParamSet.WEIGHT_KEYWORDS), (float)0.5),
+                job.getFloat(job.get(ParamSet.WEIGHT_TERMS), (float)0.5));
+        newCentroid.setDistance(distance);
+        //----------------------------------------------------------------------
+        String newPath = job.get(ParamSet.NEW_CENTROIDS_PATH) + centroidPath;
+        newCentroid.toHDFS(new Path(newPath));
     }
     
 }
