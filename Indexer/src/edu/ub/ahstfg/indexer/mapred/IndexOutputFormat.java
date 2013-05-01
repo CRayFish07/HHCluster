@@ -14,7 +14,7 @@ import org.apache.hadoop.util.Progressable;
 import edu.ub.ahstfg.io.index.IndexRecord;
 
 public class IndexOutputFormat extends FileOutputFormat<Text, IndexRecord> {
-
+    
     @Override
     public RecordWriter<Text, IndexRecord> getRecordWriter(FileSystem ignored,
             JobConf job, String name, Progressable progress) throws IOException {
@@ -23,5 +23,5 @@ public class IndexOutputFormat extends FileOutputFormat<Text, IndexRecord> {
         FSDataOutputStream fileOut = fs.create(file, progress);
         return new IndexRecordWriter(job, fileOut);
     }
-
+    
 }

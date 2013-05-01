@@ -10,8 +10,10 @@ public class ParamSet {
     public static final String OLD_CENTROIDS_PATH  = "old_centroids_path";
     public static final String NEW_CENTROIDS_PATH  = "new_centroids_path";
     public static final String K                   = "K";
+    public static final String NUM_DOCS            = "nDocs";
     public static final String NUM_KEYWORDS        = "nKeywords";
     public static final String NUM_TERMS           = "nTerms";
+    public static final String NUM_MACHINES        = "nMachines";
     public static final String WEIGHT_KEYWORDS     = "wKeywords";
     public static final String WEIGHT_TERMS        = "wTerms";
     public static final String N_ITERATION         = "nIter";

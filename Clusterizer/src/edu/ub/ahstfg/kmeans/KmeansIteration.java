@@ -6,6 +6,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
@@ -68,7 +69,7 @@ public class KmeansIteration extends Configured implements Tool {
         
         LOG.info("Setting output data types.");
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
         
         // TODO mapper and reducer
         LOG.info("Setting mapper and reducer.");
