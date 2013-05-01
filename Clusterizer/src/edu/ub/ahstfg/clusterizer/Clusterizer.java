@@ -70,7 +70,7 @@ public class Clusterizer {
             }
             res = KmeansIteration.runIteration(nIter, ParamSet.INPUT_PATH,
                     ParamSet.OUTPUT_PATH, params);
-            if (res == 1) {
+            if (res == 1 || res == -1) {
                 LOG.error("Error in iteration " + nIter + ". Aborting.");
                 break;
             }

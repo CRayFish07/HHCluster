@@ -52,7 +52,7 @@ Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
                 nKeywords, nTerms, keys, terms);
         
         String centroidPath = Centroids.CENTROIDS_FILE_PREFIX + String.valueOf(key.get());
-        // calculate distance with old centroid --------------------------------
+        // pre-calculate distance with old centroid ----------------------------
         String oldPath = job.get(ParamSet.OLD_CENTROIDS_PATH) + centroidPath;
         DocumentCentroid oldCentroid = new DocumentCentroid();
         oldCentroid.fromHDFS(new Path(oldPath));

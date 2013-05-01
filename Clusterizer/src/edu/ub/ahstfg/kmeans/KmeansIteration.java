@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 
 import edu.ub.ahstfg.hadoop.ParamSet;
 import edu.ub.ahstfg.indexer.mapred.IndexInputFormat;
-import edu.ub.ahstfg.io.document.ParsedDocument;
+import edu.ub.ahstfg.io.DocumentDistance;
 
 public class KmeansIteration extends Configured implements Tool {
     
@@ -74,7 +74,7 @@ public class KmeansIteration extends Configured implements Tool {
         // TODO mapper and reducer
         LOG.info("Setting mapper and reducer.");
         job.setMapperClass(KmeansMapper.class);
-        job.setMapOutputValueClass(ParsedDocument.class);
+        job.setMapOutputValueClass(DocumentDistance.class);
         job.setReducerClass(KmeansReducer.class);
         
         if (JobClient.runJob(job).isSuccessful()) {
