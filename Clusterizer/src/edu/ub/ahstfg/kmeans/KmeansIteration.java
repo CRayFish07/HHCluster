@@ -6,6 +6,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
@@ -22,6 +23,28 @@ import edu.ub.ahstfg.indexer.mapred.IndexInputFormat;
 import edu.ub.ahstfg.io.DocumentDistance;
 
 public class KmeansIteration extends Configured implements Tool {
+    
+    public static class SampleFilter implements PathFilter {
+        
+        private static int count =         0;
+        private static int max   = 999999999;
+        
+        @Override
+        public boolean accept(Path path) {
+            
+            if (path.getName().startsWith("_")) {
+                return false;
+            }
+            
+            SampleFilter.count++;
+            
+            if (SampleFilter.count > SampleFilter.max) {
+                return false;
+            }
+            
+            return true;
+        }
+    }
     
     private static final Logger LOG = Logger.getLogger(KmeansIteration.class);
     
@@ -49,6 +72,7 @@ public class KmeansIteration extends Configured implements Tool {
         // TODO input and output path
         LOG.info("Setting input path to '" + inputPath + "'");
         FileInputFormat.setInputPaths(job, new Path(inputPath));
+        FileInputFormat.setInputPathFilter(job, SampleFilter.class);
         
         LOG.info("Clearing the output path at '" + outputPath + "'");
         FileSystem fs = FileSystem.get(new URI(outputPath), job);
