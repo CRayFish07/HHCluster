@@ -74,6 +74,6 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
         FileSystem fs = Utils.accessHDFS();
         FSDataOutputStream out = fs.create(new Path("params"));
         out.writeInt(docs);
-        out.close(); fs.close();
+        out.close();
     }
 }

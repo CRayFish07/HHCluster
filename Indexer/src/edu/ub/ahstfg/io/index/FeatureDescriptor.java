@@ -77,6 +77,7 @@ public class FeatureDescriptor implements IndexRecord {
         for (int i = 0; i < terms.length; i++) {
             out.writeBytes(terms[i] + ",");
         }
+        out.writeBytes("\n");
     }
     
     public void writeNumFeatures() throws IOException {
@@ -84,7 +85,7 @@ public class FeatureDescriptor implements IndexRecord {
         FSDataOutputStream out = fs.create(new Path(NUM_FEATURES_PATH));
         out.writeInt(keywords.length);
         out.writeInt(terms.length);
-        out.close(); fs.close();
+        out.close();
     }
     
     public static void getNumFeatures(int[] features)

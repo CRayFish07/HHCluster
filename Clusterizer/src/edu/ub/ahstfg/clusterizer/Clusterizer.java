@@ -91,7 +91,7 @@ public class Clusterizer {
         FileSystem fs = Utils.accessHDFS();
         FSDataInputStream in = fs.open(new Path("params"));
         int ret = in.readInt();
-        in.close(); fs.close();
+        in.close();
         return ret;
     }
     
