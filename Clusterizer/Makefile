@@ -1,11 +1,11 @@
 
 ###############################################################################
-# HADOOP WORDCOUNT - ALBERTO HUELAMO SEGURA                                   #
+# HADOOP CLUSTERIZER - ALBERTO HUELAMO SEGURA                                 #
 #                                                                             #
 # *Before building...                                                         #
-# Make sure /Users/alberto/Desktop/testWordCount                              #
-#           /Users/alberto/Desktop/testWordCount/idx_input                    #
-#           /Users/alberto/Desktop/testWordCount/idx_output dirs are created. #
+# Make sure /Users/alberto/Desktop/cluster_test                              #
+#           /Users/alberto/Desktop/cluster_test/input                        #
+#           /Users/alberto/Desktop/cluster_test/output dirs are created.     #
 # -Build:                                                                     #
 # $ make                                                                      #
 #                                                                             #
@@ -24,7 +24,6 @@ HADOOP_STOP    = $(HADOOP_HOME)/bin/stop-all.sh
 HADOOP_EXE     = $(HADOOP_HOME)/bin/hadoop
 HADOOP_FORMAT  = $(HADOOP_EXE) namenode -format
 
-
 LOGGER         = /Users/alberto/direct/tfg_repo/lib/log4j-1.2.17.jar
 
 JAVA_HOME      = /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/bin
@@ -34,20 +33,20 @@ JAR            = $(JAVA_HOME)/jar
 
 CLASSPATH      = $(HADOOP_CORE):$(LOGGER)
 
-SRC_DIR        = /Users/alberto/direct/tfg_repo/Indexer/src
+SRC_DIR        = /Users/alberto/direct/tfg_repo/Clusterizer/src
 SOURCES        = $(SRC_DIR)/edu/ub/ahstfg/indexer/wordcount/*.java
 
-JAVA_DIR       = /Users/alberto/Desktop/testWordCount/java
-JAR_DIR        = ~/Desktop/testWordCount/Indexer.jar
+JAVA_DIR       = /Users/alberto/Desktop/cluster_test/java
+JAR_DIR        = ~/Desktop/cluster_test/Clusterizer.jar
 
-MAIN_CLASS     = edu.ub.ahstfg.indexer.Indexer
-#ARGS           = input output
+MAIN_CLASS     = edu.ub.ahstfg.clusterizer.Clusterizer
+ARGS           = 10 0.2 0.8 4
 
-INPUT_DIR      = ~/Desktop/testWordCount/idx_input
-INPUT_FILES    = /*.arc.gz
-OUTPUT_DIR     = ~/Desktop/testWordCount/
+INPUT_DIR      = ~/Desktop/testWordCount/output
+INPUT_FILES    = /*
+OUTPUT_DIR     = ~/Desktop/cluster_test/
 
-RUN            = $(HADOOP_EXE) jar $(JAR_DIR)
+RUN            = $(HADOOP_EXE) jar $(JAR_DIR) $(ARGS)
 
 all: clean jar
 
@@ -73,14 +72,16 @@ h_format: h_hdfs_r
 	$(HADOOP_FORMAT)
 
 h_set_input:
-	$(HADOOP_EXE) dfs -mkdir idx_input
-	$(HADOOP_EXE) dfs -put $(INPUT_DIR)$(INPUT_FILES) idx_input
+	$(HADOOP_EXE) dfs -mkdir input
+	$(HADOOP_EXE) dfs -put $(INPUT_DIR)$(INPUT_FILES) input
 
 exec:
 	$(RUN)
 
 h_get_output:
-	$(HADOOP_EXE) dfs -get idx_output $(OUTPUT_DIR)
+	$(HADOOP_EXE) dfs -get output $(OUTPUT_DIR)
+
+run: h_get_output
 
 clean:
 	rm -rf $(JAVA_DIR)

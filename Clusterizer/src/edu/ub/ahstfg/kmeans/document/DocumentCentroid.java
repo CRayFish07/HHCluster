@@ -103,6 +103,7 @@ public class DocumentCentroid implements Centroid, Writable {
         FileSystem fs = Utils.accessHDFS();
         FSDataOutputStream out = fs.create(path);
         write(out);
+        out.close();
     }
     
     @Override
@@ -110,6 +111,7 @@ public class DocumentCentroid implements Centroid, Writable {
         FileSystem fs = Utils.accessHDFS();
         FSDataInputStream in = fs.open(path);
         readFields(in);
+        in.close();
     }
     
     public double distance(DocumentCentroid other, float wk, float wt) {

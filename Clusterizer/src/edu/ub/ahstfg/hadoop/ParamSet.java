@@ -19,7 +19,7 @@ public class ParamSet {
     public static final String N_ITERATION         = "nIter";
     
     // Param default values
-    public static final String INPUT_PATH          = "kmeans_input";
+    public static final String INPUT_PATH          = "idx_output";
     public static final String OUTPUT_PATH         = "kmeans_output";
     
     private HashMap<String, String>  strings;

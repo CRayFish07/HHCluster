@@ -21,6 +21,8 @@ import edu.ub.ahstfg.kmeans.document.DocumentCentroid;
 public class KmeansReducer extends MapReduceBase implements
 Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
     
+    public static final String REDUCER_GROUP = "Reducer report";
+    
     private JobConf job;
     
     @Override
@@ -32,6 +34,7 @@ Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
     public void reduce(IntWritable key, Iterator<DocumentDistance> values,
             OutputCollector<Text, IntWritable> output, Reporter reporter)
                     throws IOException {
+        reporter.incrCounter(REDUCER_GROUP, "Num reducers", 1);
         int nKeywords = job.getInt(ParamSet.NUM_KEYWORDS, 0);
         int nTerms    = job.getInt(ParamSet.NUM_TERMS   , 0);
         //boolean haveKeywords = nKeywords > 0;

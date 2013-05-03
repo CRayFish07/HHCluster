@@ -20,6 +20,8 @@ import edu.ub.ahstfg.utils.Metrics;
 public class KmeansMapper extends MapReduceBase implements
 Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
     
+    public static final String MAPPER_GROUP = "Mapper report";
+    
     private JobConf job;
     
     private Centroids centroids;
@@ -33,6 +35,7 @@ Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
     public void map(IntWritable key, ArrayWritable value,
             OutputCollector<IntWritable, DocumentDistance> output,
             Reporter reporter) throws IOException {
+        reporter.incrCounter(MAPPER_GROUP, "Num mappers", 1);
         String centroidsPath = job.get(ParamSet.OLD_CENTROIDS_PATH);
         int K = job.getInt(ParamSet.K, 0);
         if(K <= 0) {

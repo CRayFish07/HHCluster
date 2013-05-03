@@ -23,7 +23,7 @@ public class HDFSAccess {
         //        dfs.delete(new Path("test"), true);
         FileSystem fs = Utils.accessHDFS();
         FSDataOutputStream out = fs.create(PATH);
-        //        FeatureDescriptor fd = new FeatureDescriptor(new String[] {"ola", "ke"}, new String[] {"ase"});
+        //        FeatureDescriptor fd = new FeatureDescriptor(new String[] {"ola", "ke"}, new String[] {});
         //        fd.writeOutput(out);
         //        LOG.info("WRITE: Num terms = " + fd.getTerms().length);
         //        LOG.info("WRITE: Num keywords = " + fd.getKeywords().length);

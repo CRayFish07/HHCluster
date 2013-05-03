@@ -78,7 +78,7 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
     
     private void writeNumDocs(int docs) throws IOException {
         FileSystem fs = Utils.accessHDFS();
-        FSDataOutputStream out = fs.create(new Path("params"));
+        FSDataOutputStream out = fs.create(new Path(FeatureDescriptor.NUM_DOCS_PATH));
         out.writeInt(docs);
         out.close();
     }

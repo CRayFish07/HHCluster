@@ -18,7 +18,8 @@ import edu.ub.ahstfg.utils.Utils;
 public class FeatureDescriptor implements IndexRecord {
     
     public static final String KEY = "<<<FeatureDescriptor>>>";
-    public static final String NUM_FEATURES_PATH = "n_features/n_features";
+    public static final String NUM_FEATURES_PATH = "n_features.param";
+    public static final String NUM_DOCS_PATH = "num_docs.param";
     
     private String[] terms;
     private String[] keywords;

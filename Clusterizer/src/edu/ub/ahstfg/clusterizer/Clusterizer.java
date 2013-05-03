@@ -18,10 +18,10 @@ public class Clusterizer {
     
     private static final Logger LOG = Logger.getLogger(Clusterizer.class);
     
-    private static final int P_K           = 0;
-    private static final int W_KEYWORDS    = 1;
-    private static final int W_TERMS       = 2;
-    private static final int N_MACHINES    = 3;
+    private static final int P_K        = 0;
+    private static final int W_KEYWORDS = 1;
+    private static final int W_TERMS    = 2;
+    private static final int N_MACHINES = 3;
     
     private ParamSet params;
     
@@ -31,57 +31,84 @@ public class Clusterizer {
     private boolean finish;
     
     public Clusterizer(int K, String args[]) throws IOException {
+        LOG.info("Initiating...");
         params    = new ParamSet();
         centroids = new Centroids(K, DocumentCentroid.class);
         params.setInt(ParamSet.K, K);
+        LOG.info("K setted (" + K + ")");
         
+        LOG.info("Getting number of documents...");
         int nDocs = readNumDocs();
         params.setInt(ParamSet.NUM_DOCS, nDocs);
+        LOG.info("Number of documents = " + nDocs);
         
+        LOG.info("Getting number of features...");
         int[] nFeatures = new int[2];
         FeatureDescriptor.getNumFeatures(nFeatures);
         params.setInt(ParamSet.NUM_KEYWORDS, nFeatures[0]);
         params.setInt(ParamSet.NUM_TERMS   , nFeatures[1]);
+        LOG.info("Number of keywords = " + nFeatures[0]);
+        LOG.info("Number of terms = " + nFeatures[1]);
+        
         centroids.randomDocumentInit(nFeatures[0], nFeatures[1]);
+        LOG.info("Random centroid set initiated.");
         
         nIter  = 0;
         finish = false;
         
         params.setFloat(ParamSet.WEIGHT_KEYWORDS, Float.valueOf(args[W_KEYWORDS]));
         params.setFloat(ParamSet.WEIGHT_TERMS   , Float.valueOf(args[W_TERMS]));
+        LOG.info("Setted feature weights. wKeywords = " + args[W_KEYWORDS] +
+                ", wTerms = " + args[W_TERMS]);
         
         params.setInt(ParamSet.NUM_MACHINES, Integer.valueOf(args[N_MACHINES]));
+        LOG.info("Number of machines = " + args[N_MACHINES]);
     }
     
     public void engage() {
         int res;
         String oldCentroidsDir, newCentroidsDir;
         do {
+            LOG.info("Iteration " + nIter + " > Begin.");
             oldCentroidsDir = Centroids.CENTROIDS_DIR_PREFIX
                     + String.valueOf(nIter);
             newCentroidsDir = Centroids.CENTROIDS_DIR_PREFIX
                     + String.valueOf(nIter + 1);
             params.setString(ParamSet.OLD_CENTROIDS_PATH, oldCentroidsDir);
             params.setString(ParamSet.NEW_CENTROIDS_PATH, newCentroidsDir);
+            LOG.info("Iteration " + nIter + " > Old centroids dir setted to " + oldCentroidsDir);
+            LOG.info("Iteration " + nIter + " > New centroids dir setted to " + newCentroidsDir);
             try {
                 centroids.toHDFS(oldCentroidsDir);
+                LOG.info("Iteration " + nIter + " > Written old centroids.");
             } catch (IOException e) {
+                LOG.error("Iteration " + nIter + " > Problem writting old centroids. Aborting...");
                 e.printStackTrace();
+                break;
             }
+            LOG.info("Iteration " + nIter + " > Running Hadoop job...");
             res = KmeansIteration.runIteration(nIter, ParamSet.INPUT_PATH,
                     ParamSet.OUTPUT_PATH, params);
-            if (res == 1 || res == -1) {
-                LOG.error("Error in iteration " + nIter + ". Aborting.");
+            LOG.info("Iteration " + nIter + " > Hadoop job result: " + res);
+            if (res == 1 || res < 0) {
+                LOG.error("Error in iteration " + nIter + " > ERR = " + res + ". Aborting...");
                 break;
             }
             try {
+                LOG.info("Iteration " + nIter + " > Reading new centroids.");
                 centroids.fromHDFS(newCentroidsDir);
             } catch (IOException e) {
+                LOG.error("Iteration " + nIter + " > Problem reading new centroids. Aborting...");
                 e.printStackTrace();
+                break;
             }
             nIter++;
+            LOG.info("Iteration " + nIter + " > Iteration checking...");
             if (centroids.isFinished()) {
+                LOG.info("Iteration " + nIter + " > Finishing...");
                 finish = true;
+            } else {
+                LOG.info("Iteration " + nIter + " > New iteration required.");
             }
         } while (!finish);
         LOG.info("Finished in " + nIter + " iterations.");
@@ -89,7 +116,8 @@ public class Clusterizer {
     
     private int readNumDocs() throws IOException {
         FileSystem fs = Utils.accessHDFS();
-        FSDataInputStream in = fs.open(new Path("params"));
+        FSDataInputStream in = fs.open(
+                new Path(FeatureDescriptor.NUM_DOCS_PATH));
         int ret = in.readInt();
         in.close();
         return ret;
@@ -97,22 +125,22 @@ public class Clusterizer {
     
     public static void main(String[] args) {
         if(args.length != 4) {
-            System.err.println("Args: <K> <keywords_weight> <term_weight> <num_machines>");
+            LOG.error("Args: <K> <keywords_weight> <term_weight> <num_machines>");
             return;
         }
         int k = 0;
         try {
             k = Integer.valueOf(args[P_K]);
         } catch(NumberFormatException ex) {
-            System.err.println("Args: <K> <keywords_weight> <term_weight> <num_machines>");
-            System.err.println("K must be an integer.");
+            LOG.error("Args: <K> <keywords_weight> <term_weight> <num_machines>");
+            LOG.error("K must be an integer.");
             return;
         }
         try {
             Clusterizer app = new Clusterizer(k, args);
             app.engage();
         } catch (IOException e) {
-            System.err.println("Problem accessing HDFS.");
+            LOG.error("Problem accessing HDFS.");
             e.printStackTrace();
         }
     }
