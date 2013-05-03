@@ -23,6 +23,8 @@ import edu.ub.ahstfg.utils.Utils;
 public class IndexerReducer extends MapReduceBase implements
 Reducer<Text, ParsedDocument, Text, IndexRecord> {
     
+    public static final String REDUCER_REPORT = "Reducer report";
+    
     @Override
     public void reduce(Text key, Iterator<ParsedDocument> values,
             OutputCollector<Text, IndexRecord> output, Reporter reporter)
@@ -56,6 +58,10 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
         
         String[] terms = index.getTermVector();
         String[] keywords = index.getKeywordVector();
+        
+        reporter.incrCounter(REDUCER_REPORT, "Term number", terms.length);
+        reporter.incrCounter(REDUCER_REPORT, "Keyword number", keywords.length);
+        
         FeatureDescriptor fd = new FeatureDescriptor(terms, keywords);
         output.collect(new Text("<<<FeatureDescriptor>>>"), fd);
         

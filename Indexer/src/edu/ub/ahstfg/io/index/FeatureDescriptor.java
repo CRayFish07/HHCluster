@@ -91,7 +91,7 @@ public class FeatureDescriptor implements IndexRecord {
     public static void getNumFeatures(int[] features)
             throws IllegalArgumentException, IOException {
         if(features.length != 2) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Feature array size must be 2.");
         }
         FileSystem fs = Utils.accessHDFS();
         FSDataInputStream in = fs.open(new Path(NUM_FEATURES_PATH));
