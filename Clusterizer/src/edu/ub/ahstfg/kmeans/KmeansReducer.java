@@ -63,14 +63,14 @@ Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
         if(!stub) {
             newCentroid = DocumentCentroid.calculateCentroid(
                     nKeywords, nTerms, keys, terms);
-            double distance = newCentroid.distance(oldCentroid,
-                    job.getFloat(job.get(ParamSet.WEIGHT_KEYWORDS), (float)0.5),
-                    job.getFloat(job.get(ParamSet.WEIGHT_TERMS), (float)0.5));
-            newCentroid.setDistance(distance);
         } else {
             newCentroid = oldCentroid;
             reporter.incrCounter(REPORTER_GROUP, "Stub centroids", 1);
         }
+        double distance = newCentroid.distance(oldCentroid,
+                job.getFloat(job.get(ParamSet.WEIGHT_KEYWORDS), (float)0.5),
+                job.getFloat(job.get(ParamSet.WEIGHT_TERMS), (float)0.5));
+        newCentroid.setDistance(distance);
         String newPath = job.get(ParamSet.NEW_CENTROIDS_PATH) + centroidPath;
         newCentroid.toHDFS(new Path(newPath));
     }
