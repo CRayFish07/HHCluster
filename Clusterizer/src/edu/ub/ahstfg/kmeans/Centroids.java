@@ -3,13 +3,16 @@ package edu.ub.ahstfg.kmeans;
 import java.io.IOException;
 
 import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Logger;
 
 import edu.ub.ahstfg.kmeans.document.DocumentCentroid;
 
 public class Centroids {
     
-    public static final String CENTROIDS_DIR_PREFIX  = "./centroids_";
-    public static final String CENTROIDS_FILE_PREFIX = "/centroid_";
+    private static final Logger LOG = Logger.getLogger(Centroids.class);
+    
+    public static final String CENTROIDS_DIR_PREFIX  = "./cs_";
+    public static final String CENTROIDS_FILE_PREFIX = "/c_";
     
     private int K;
     private Centroid[] centroids;
@@ -35,7 +38,8 @@ public class Centroids {
     
     public boolean isFinished() {
         for(Centroid c: centroids) {
-            if(c.getDistance() > 20.0) {
+            LOG.info("Distance: " + c.getDistance());
+            if(c.getDistance() > 10.0) {
                 return false;
             }
         }

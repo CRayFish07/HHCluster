@@ -40,10 +40,10 @@ public class DocumentCentroid implements Centroid, Writable {
         this(keywords, terms);
         if(random) {
             for (int i = 0; i < keywords; i++) {
-                keywordVector[i] = Utils.randomIntRange(0, RANDOM_MAX_RANGE);
+                keywordVector[i] = Utils.randomIntRange(5, RANDOM_MAX_RANGE);
             }
             for (int i = 0; i < terms; i++) {
-                termVector[i] = Utils.randomIntRange(0, RANDOM_MAX_RANGE);
+                termVector[i] = Utils.randomIntRange(5, RANDOM_MAX_RANGE);
             }
         }
         distance = 0.0;
