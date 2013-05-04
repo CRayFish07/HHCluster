@@ -21,7 +21,7 @@ import edu.ub.ahstfg.kmeans.document.DocumentCentroid;
 public class KmeansReducer extends MapReduceBase implements
 Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
     
-    public static final String REDUCER_GROUP = "Reducer report";
+    public static final String REPORTER_GROUP = "Reducer report";
     
     private JobConf job;
     
@@ -34,7 +34,7 @@ Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
     public void reduce(IntWritable key, Iterator<DocumentDistance> values,
             OutputCollector<Text, IntWritable> output, Reporter reporter)
                     throws IOException {
-        reporter.incrCounter(REDUCER_GROUP, "Num reducers", 1);
+        reporter.incrCounter(REPORTER_GROUP, "Num reducers", 1);
         int nKeywords = job.getInt(ParamSet.NUM_KEYWORDS, 0);
         int nTerms    = job.getInt(ParamSet.NUM_TERMS   , 0);
         //boolean haveKeywords = nKeywords > 0;
@@ -43,27 +43,34 @@ Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
         ArrayList<long[]> keys = new ArrayList<long[]>();
         ArrayList<long[]> terms = new ArrayList<long[]>();
         DocumentDescriptor doc;
+        boolean stub = false;
         while(values.hasNext()) {
-            d = values.next();
+            d = values.next(); stub = d.isStub();
+            if(stub) { break; }
             doc = d.getDoc();
             keys.add(doc.getKeyFreq());
             terms.add(doc.getTermFreq());
             output.collect(new Text(doc.getUrl()), key);
         }
         
-        DocumentCentroid newCentroid = DocumentCentroid.calculateCentroid(
-                nKeywords, nTerms, keys, terms);
-        
         String centroidPath = Centroids.CENTROIDS_FILE_PREFIX + String.valueOf(key.get());
-        // pre-calculate distance with old centroid ----------------------------
         String oldPath = job.get(ParamSet.OLD_CENTROIDS_PATH) + centroidPath;
         DocumentCentroid oldCentroid = new DocumentCentroid();
         oldCentroid.fromHDFS(new Path(oldPath));
-        double distance = newCentroid.distance(oldCentroid,
-                job.getFloat(job.get(ParamSet.WEIGHT_KEYWORDS), (float)0.5),
-                job.getFloat(job.get(ParamSet.WEIGHT_TERMS), (float)0.5));
-        newCentroid.setDistance(distance);
-        //----------------------------------------------------------------------
+        
+        DocumentCentroid newCentroid = null;
+        
+        if(!stub) {
+            newCentroid = DocumentCentroid.calculateCentroid(
+                    nKeywords, nTerms, keys, terms);
+            double distance = newCentroid.distance(oldCentroid,
+                    job.getFloat(job.get(ParamSet.WEIGHT_KEYWORDS), (float)0.5),
+                    job.getFloat(job.get(ParamSet.WEIGHT_TERMS), (float)0.5));
+            newCentroid.setDistance(distance);
+        } else {
+            newCentroid = oldCentroid;
+            reporter.incrCounter(REPORTER_GROUP, "Stub centroids", 1);
+        }
         String newPath = job.get(ParamSet.NEW_CENTROIDS_PATH) + centroidPath;
         newCentroid.toHDFS(new Path(newPath));
     }

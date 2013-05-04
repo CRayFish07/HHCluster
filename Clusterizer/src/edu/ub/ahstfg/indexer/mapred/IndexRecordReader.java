@@ -19,6 +19,8 @@ import edu.ub.ahstfg.utils.Utils;
 
 public class IndexRecordReader implements RecordReader<IntWritable, ArrayWritable> {
     
+    public static final String REPORTER_GROUP = "Index record reader";
+    
     private LineRecordReader lineReader;
     private LongWritable lineKey;
     private Text lineValue;
@@ -27,7 +29,8 @@ public class IndexRecordReader implements RecordReader<IntWritable, ArrayWritabl
     
     private int iMapper;
     
-    public IndexRecordReader(JobConf job, FileSplit input) throws IOException {
+    public IndexRecordReader(JobConf job, FileSplit input)
+            throws IOException {
         lineReader = new LineRecordReader(job, input);
         lineKey    = lineReader.createKey();
         lineValue  = lineReader.createValue();

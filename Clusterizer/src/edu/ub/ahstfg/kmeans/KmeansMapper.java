@@ -20,11 +20,15 @@ import edu.ub.ahstfg.utils.Metrics;
 public class KmeansMapper extends MapReduceBase implements
 Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
     
-    public static final String MAPPER_GROUP = "Mapper report";
+    public static final String REPORTER_GROUP = "Mapper report";
     
     private JobConf job;
+    private OutputCollector<IntWritable, DocumentDistance> output;
+    private Reporter reporter;
     
     private Centroids centroids;
+    
+    private int[] filledCentroids;
     
     @Override
     public void configure(JobConf job) {
@@ -35,7 +39,11 @@ Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
     public void map(IntWritable key, ArrayWritable value,
             OutputCollector<IntWritable, DocumentDistance> output,
             Reporter reporter) throws IOException {
-        reporter.incrCounter(MAPPER_GROUP, "Num mappers", 1);
+        reporter.incrCounter(REPORTER_GROUP, "Num mappers", 1);
+        
+        this.output   = output;
+        this.reporter = reporter;
+        
         String centroidsPath = job.get(ParamSet.OLD_CENTROIDS_PATH);
         int K = job.getInt(ParamSet.K, 0);
         if(K <= 0) {
@@ -50,6 +58,9 @@ Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
         
         centroids = new Centroids(K, DocumentCentroid.class);
         centroids.fromHDFS(centroidsPath);
+        
+        filledCentroids = new int[K];
+        for(Integer i: filledCentroids) { i = 0; }
         
         Writable[] ws = value.get();
         DocumentDescriptor doc;
@@ -78,6 +89,22 @@ Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
                 }
             }
             output.collect(new IntWritable(finalCentroid), new DocumentDistance(doc, finalDistance));
+            fillCentroid(finalCentroid, 1);
+        }
+        outVoidCentroids(output);
+    }
+    
+    private void fillCentroid(int centroid, int amount) {
+        filledCentroids[centroid] += amount;
+        reporter.incrCounter(REPORTER_GROUP,
+                "Docs to centroid " + centroid, amount);
+    }
+    
+    private void outVoidCentroids(OutputCollector<IntWritable, DocumentDistance> output) throws IOException {
+        for(int i = 0; i < filledCentroids.length; i++) {
+            if(filledCentroids[i] < 1) {
+                output.collect(new IntWritable(i), new DocumentDistance(DocumentDistance.IS_STUB));
+            }
         }
     }
     

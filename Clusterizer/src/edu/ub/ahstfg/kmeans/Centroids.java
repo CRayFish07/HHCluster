@@ -35,7 +35,7 @@ public class Centroids {
     
     public boolean isFinished() {
         for(Centroid c: centroids) {
-            if(c.getDistance() != 0.0) {
+            if(c.getDistance() > 20.0) {
                 return false;
             }
         }

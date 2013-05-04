@@ -25,7 +25,7 @@ public class DocumentCentroid implements Centroid, Writable {
     private static final Logger LOG = Logger.getLogger(DocumentCentroid.class);
     
     public static final boolean RANDOM           = true;
-    public static final int     RANDOM_MAX_RANGE = 100;
+    public static final int     RANDOM_MAX_RANGE = 10;
     
     private long[] keywordVector;
     private long[] termVector;
