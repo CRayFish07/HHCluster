@@ -51,10 +51,12 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
             keywordMap = pDoc.getKeywordMap();
             if (keywordMap != null) {
                 for (String keyword : keywordMap.keySet()) {
-                    index.addTerm(keyword, url, keywordMap.get(keyword));
+                    index.addKeyword(keyword, url, keywordMap.get(keyword));
                 }
             }
         }
+        
+        index.filter();
         
         String[] terms = index.getTermVector();
         String[] keywords = index.getKeywordVector();

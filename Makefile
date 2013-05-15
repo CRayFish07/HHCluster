@@ -32,6 +32,8 @@ h_hdfs_r:
 h_format: h_hdfs_r
 	$(HADOOP_FORMAT)
 
+h_fullstop: h_stop h_format
+
 reset: h_stop h_format h_start idx_set_input
 
 exec: indexing clustering

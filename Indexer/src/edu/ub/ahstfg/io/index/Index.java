@@ -14,19 +14,21 @@ import org.apache.hadoop.io.Writable;
 import edu.ub.ahstfg.io.WritableConverter;
 
 public class Index implements Writable {
-
+    
     private ArrayList<String> terms;
     private HashMap<String, ArrayList<Long>> termFreq;
+    private HashMap<String, ArrayList<Byte>> termAppearance;
     private ArrayList<String> keywords;
     private HashMap<String, ArrayList<Long>> keywordFreq;
-
+    
     public Index() {
         terms = new ArrayList<String>();
         termFreq = new HashMap<String, ArrayList<Long>>();
+        termAppearance = new HashMap<String, ArrayList<Byte>>();
         keywords = new ArrayList<String>();
         keywordFreq = new HashMap<String, ArrayList<Long>>();
     }
-
+    
     public void addTerm(final String term, final String url, final long freq) {
         if (!termFreq.containsKey(url)) {
             ArrayList<Long> l = new ArrayList<Long>();
@@ -54,11 +56,11 @@ public class Index implements Writable {
             }
         }
     }
-
+    
     public String[] getTermVector() {
         return terms.toArray(new String[terms.size()]);
     }
-
+    
     public String[] getDocumentTermVector() {
         String[] ret = new String[termFreq.size()];
         int i = 0;
@@ -68,7 +70,7 @@ public class Index implements Writable {
         }
         return ret;
     }
-
+    
     public long[][] getTermFreqMatrix() {
         long[][] ret = new long[termFreq.size()][terms.size()];
         int i = 0, j = 0;
@@ -84,7 +86,17 @@ public class Index implements Writable {
         }
         return ret;
     }
-
+    
+    public void removeTerm(String term) {
+        int idx = terms.indexOf(term);
+        terms.remove(idx);
+        ArrayList<Long> tf;
+        for(String url: termFreq.keySet()) {
+            tf = termFreq.get(url);
+            tf.remove(idx);
+        }
+    }
+    
     public void addKeyword(final String keyword, final String url,
             final long freq) {
         if (!keywordFreq.containsKey(url)) {
@@ -113,11 +125,11 @@ public class Index implements Writable {
             }
         }
     }
-
+    
     public String[] getKeywordVector() {
         return keywords.toArray(new String[keywords.size()]);
     }
-
+    
     public long[][] getKeywordFreqMatrix() {
         long[][] ret = new long[termFreq.size()][terms.size()];
         int i = 0, j = 0;
@@ -137,36 +149,36 @@ public class Index implements Writable {
         }
         return ret;
     }
-
+    
     @Override
     public void readFields(DataInput input) throws IOException {
         ArrayWritable wTerms = new ArrayWritable(Text.class);
         wTerms.readFields(input);
         terms = WritableConverter.arrayWritable2ArrayListString(wTerms);
-
+        
         MapWritable wTermFreq = new MapWritable();
         wTermFreq.readFields(input);
         termFreq = WritableConverter
                 .mapWritable2HashMapStringArrayListLong(wTermFreq);
-
+        
         ArrayWritable wKeywords = new ArrayWritable(Text.class);
         wKeywords.readFields(input);
         keywords = WritableConverter.arrayWritable2ArrayListString(wKeywords);
-
+        
         MapWritable wKeywordFreq = new MapWritable();
         wKeywordFreq.readFields(input);
         keywordFreq = WritableConverter
                 .mapWritable2HashMapStringArrayListLong(wKeywordFreq);
     }
-
+    
     @Override
     public void write(DataOutput output) throws IOException {
         WritableConverter.arrayListString2ArrayWritable(terms).write(output);
         WritableConverter.hashMapStringArrayListLong2MapWritable(termFreq)
-                .write(output);
+        .write(output);
         WritableConverter.arrayListString2ArrayWritable(keywords).write(output);
         WritableConverter.hashMapStringArrayListLong2MapWritable(keywordFreq)
-                .write(output);
+        .write(output);
     }
-
+    
 }
