@@ -21,21 +21,21 @@ import edu.ub.ahstfg.io.index.IndexRecord;
 import edu.ub.ahstfg.utils.Utils;
 
 public class IndexerReducer extends MapReduceBase implements
-        Reducer<Text, ParsedDocument, Text, IndexRecord> {
-
+Reducer<Text, ParsedDocument, Text, IndexRecord> {
+    
     public static final String REDUCER_REPORT = "Reducer report";
-
+    
     @Override
     public void reduce(Text key, Iterator<ParsedDocument> values,
             OutputCollector<Text, IndexRecord> output, Reporter reporter)
-            throws IOException {
-
+                    throws IOException {
+        
         if (values == null) {
             return;
         }
-
-        Index index = new Index();
-
+        
+        Index index = new Index(reporter);
+        
         ParsedDocument pDoc;
         String url;
         HashMap<String, Long> termMap, keywordMap;
@@ -55,18 +55,18 @@ public class IndexerReducer extends MapReduceBase implements
                 }
             }
         }
-
+        
         index.filter(0.2, 0.8);
-
+        
         String[] terms = index.getTermVector();
         String[] keywords = index.getKeywordVector();
-
+        
         reporter.incrCounter(REDUCER_REPORT, "Term number", terms.length);
         reporter.incrCounter(REDUCER_REPORT, "Keyword number", keywords.length);
-
+        
         FeatureDescriptor fd = new FeatureDescriptor(terms, keywords);
         output.collect(new Text("<<<FeatureDescriptor>>>"), fd);
-
+        
         String[] urls = index.getDocumentTermVector();
         long[][] termFreq = index.getTermFreqMatrix();
         long[][] keyFreq = index.getKeywordFreqMatrix();
@@ -74,10 +74,10 @@ public class IndexerReducer extends MapReduceBase implements
             output.collect(new Text(urls[i]), new DocumentDescriptor(urls[i],
                     termFreq[i], keyFreq[i]));
         }
-
+        
         writeNumDocs(urls.length);
     }
-
+    
     private void writeNumDocs(int docs) throws IOException {
         FileSystem fs = Utils.accessHDFS();
         FSDataOutputStream out = fs.create(new Path(

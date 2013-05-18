@@ -10,31 +10,38 @@ import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.mapred.Reporter;
 
 import edu.ub.ahstfg.io.WritableConverter;
 
 public class Index implements Writable {
-
+    
     private ArrayList<String> terms;
     private HashMap<String, ArrayList<Long>> termFreq;
-
+    
     private HashMap<String, ArrayList<String>> termAppearance;
-
+    
     private ArrayList<String> keywords;
     private HashMap<String, ArrayList<Long>> keywordFreq;
-
-    public Index() {
+    
+    private Reporter reporter;
+    
+    public Index(Reporter reporter) {
         terms = new ArrayList<String>();
         termFreq = new HashMap<String, ArrayList<Long>>();
-
+        
         termAppearance = new HashMap<String, ArrayList<String>>();
-
+        
         keywords = new ArrayList<String>();
         keywordFreq = new HashMap<String, ArrayList<Long>>();
+        
+        this.reporter = reporter;
+        reporter.incrCounter("Index report", "Remove term request", 0);
+        reporter.incrCounter("Index report", "Removed terms", 0);
     }
-
+    
     public void addTerm(final String term, final String url, final long freq) {
-        addTermAppearance(term, url);
+        addTermAppearance(url, term);
         if (!termFreq.containsKey(url)) {
             ArrayList<Long> l = new ArrayList<Long>();
             for (int i = 0; i < terms.size(); i++) {
@@ -61,7 +68,7 @@ public class Index implements Writable {
             }
         }
     }
-
+    
     private void addTermAppearance(final String url, final String term) {
         if (!termAppearance.containsKey(term)) {
             termAppearance.put(term, new ArrayList<String>());
@@ -71,11 +78,11 @@ public class Index implements Writable {
             docs.add(url);
         }
     }
-
+    
     public String[] getTermVector() {
         return terms.toArray(new String[terms.size()]);
     }
-
+    
     public String[] getDocumentTermVector() {
         String[] ret = new String[termFreq.size()];
         int i = 0;
@@ -85,7 +92,7 @@ public class Index implements Writable {
         }
         return ret;
     }
-
+    
     public long[][] getTermFreqMatrix() {
         long[][] ret = new long[termFreq.size()][terms.size()];
         int i = 0, j = 0;
@@ -101,17 +108,20 @@ public class Index implements Writable {
         }
         return ret;
     }
-
+    
     public void removeTerm(String term) {
         int idx = terms.indexOf(term);
-        terms.remove(idx);
-        ArrayList<Long> tf;
-        for (String url : termFreq.keySet()) {
-            tf = termFreq.get(url);
-            tf.remove(idx);
+        if(idx > 0) {
+            terms.remove(idx);
+            ArrayList<Long> tf;
+            for (String url : termFreq.keySet()) {
+                tf = termFreq.get(url);
+                tf.remove(idx);
+            }
+            reporter.incrCounter("Index report", "Removed terms", 1);
         }
     }
-
+    
     public void filter(double infCote, double supCote) {
         int nDocs, totalDocs = termFreq.size();
         double rate;
@@ -120,10 +130,11 @@ public class Index implements Writable {
             rate = (double) nDocs / (double) totalDocs;
             if (rate < infCote || rate > supCote) {
                 removeTerm(term);
+                reporter.incrCounter("Index report", "Remove term request", 1);
             }
         }
     }
-
+    
     public void addKeyword(final String keyword, final String url,
             final long freq) {
         if (!keywordFreq.containsKey(url)) {
@@ -152,11 +163,11 @@ public class Index implements Writable {
             }
         }
     }
-
+    
     public String[] getKeywordVector() {
         return keywords.toArray(new String[keywords.size()]);
     }
-
+    
     public long[][] getKeywordFreqMatrix() {
         long[][] ret = new long[termFreq.size()][terms.size()];
         int i = 0, j = 0;
@@ -176,36 +187,36 @@ public class Index implements Writable {
         }
         return ret;
     }
-
+    
     @Override
     public void readFields(DataInput input) throws IOException {
         ArrayWritable wTerms = new ArrayWritable(Text.class);
         wTerms.readFields(input);
         terms = WritableConverter.arrayWritable2ArrayListString(wTerms);
-
+        
         MapWritable wTermFreq = new MapWritable();
         wTermFreq.readFields(input);
         termFreq = WritableConverter
                 .mapWritable2HashMapStringArrayListLong(wTermFreq);
-
+        
         ArrayWritable wKeywords = new ArrayWritable(Text.class);
         wKeywords.readFields(input);
         keywords = WritableConverter.arrayWritable2ArrayListString(wKeywords);
-
+        
         MapWritable wKeywordFreq = new MapWritable();
         wKeywordFreq.readFields(input);
         keywordFreq = WritableConverter
                 .mapWritable2HashMapStringArrayListLong(wKeywordFreq);
     }
-
+    
     @Override
     public void write(DataOutput output) throws IOException {
         WritableConverter.arrayListString2ArrayWritable(terms).write(output);
         WritableConverter.hashMapStringArrayListLong2MapWritable(termFreq)
-                .write(output);
+        .write(output);
         WritableConverter.arrayListString2ArrayWritable(keywords).write(output);
         WritableConverter.hashMapStringArrayListLong2MapWritable(keywordFreq)
-                .write(output);
+        .write(output);
     }
-
+    
 }

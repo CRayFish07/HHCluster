@@ -60,7 +60,9 @@ Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
         centroids.fromHDFS(centroidsPath);
         
         filledCentroids = new int[K];
-        for(Integer i: filledCentroids) { i = 0; }
+        for(int i = 0; i < filledCentroids.length; i++) {
+            filledCentroids[i] = 0;
+        }
         
         Writable[] ws = value.get();
         DocumentDescriptor doc;
@@ -69,6 +71,7 @@ Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
         double finalDistance;
         int finalCentroid;
         for(int iDoc = 0; iDoc < ws.length; iDoc++) {
+            reporter.incrCounter(REPORTER_GROUP, "Num docs", 1);
             doc = (DocumentDescriptor)ws[iDoc];
             finalDistance = -1.0;
             finalCentroid = -1;
@@ -102,7 +105,8 @@ Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
     
     private void outVoidCentroids(OutputCollector<IntWritable, DocumentDistance> output) throws IOException {
         for(int i = 0; i < filledCentroids.length; i++) {
-            if(filledCentroids[i] < 1) {
+            if(filledCentroids[i] <= 0) {
+                reporter.incrCounter(REPORTER_GROUP, "Stub centroid " + i, 1);
                 output.collect(new IntWritable(i), new DocumentDistance(DocumentDistance.IS_STUB));
             }
         }

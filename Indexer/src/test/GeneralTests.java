@@ -36,7 +36,7 @@ public class GeneralTests {
             }
         }
         
-        Index idx = new Index();
+        Index idx = new Index(null);
         String[] keywords = idx.getKeywordVector();
         String[] terms = idx.getTermVector();
         FeatureDescriptor fd = new FeatureDescriptor(terms, keywords);

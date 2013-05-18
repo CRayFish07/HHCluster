@@ -43,14 +43,23 @@ Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
         ArrayList<long[]> keys = new ArrayList<long[]>();
         ArrayList<long[]> terms = new ArrayList<long[]>();
         DocumentDescriptor doc;
-        boolean stub = false;
+        boolean stub = false, allStub = false;
+        int nStub = 0, count = 0;
         while(values.hasNext()) {
+            count++;
             d = values.next(); stub = d.isStub();
-            if(stub) { break; }
-            doc = d.getDoc();
-            keys.add(doc.getKeyFreq());
-            terms.add(doc.getTermFreq());
-            output.collect(new Text(doc.getUrl()), key);
+            if(!stub) {
+                doc = d.getDoc();
+                keys.add(doc.getKeyFreq());
+                terms.add(doc.getTermFreq());
+                output.collect(new Text(doc.getUrl()), key);
+            } else {
+                nStub++;
+            }
+        }
+        
+        if(nStub >= count) {
+            allStub = true;
         }
         
         String centroidPath = Centroids.CENTROIDS_FILE_PREFIX + String.valueOf(key.get());
@@ -60,7 +69,7 @@ Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
         
         DocumentCentroid newCentroid = null;
         
-        if(!stub) {
+        if(!allStub) {
             newCentroid = DocumentCentroid.calculateCentroid(
                     nKeywords, nTerms, keys, terms);
         } else {

@@ -69,6 +69,7 @@ public class Clusterizer {
         int res;
         String oldCentroidsDir, newCentroidsDir;
         do {
+            nIter++;
             LOG.info("Iteration " + nIter + " > Begin.");
             oldCentroidsDir = Centroids.CENTROIDS_DIR_PREFIX
                     + String.valueOf(nIter);
@@ -102,7 +103,6 @@ public class Clusterizer {
                 e.printStackTrace();
                 break;
             }
-            nIter++;
             LOG.info("Iteration " + nIter + " > Iteration checking...");
             if (centroids.isFinished()) {
                 LOG.info("Iteration " + nIter + " > Finishing...");
