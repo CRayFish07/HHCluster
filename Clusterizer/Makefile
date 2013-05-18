@@ -3,9 +3,9 @@
 # HADOOP CLUSTERIZER - ALBERTO HUELAMO SEGURA                                 #
 #                                                                             #
 # *Before building...                                                         #
-# Make sure /Users/alberto/Desktop/cluster_test                              #
-#           /Users/alberto/Desktop/cluster_test/input                        #
-#           /Users/alberto/Desktop/cluster_test/output dirs are created.     #
+# Make sure /Users/alberto/Desktop/cluster_test                               #
+#           /Users/alberto/Desktop/cluster_test/input                         #
+#           /Users/alberto/Desktop/cluster_test/output dirs are created.      #
 # -Build:                                                                     #
 # $ make                                                                      #
 #                                                                             #

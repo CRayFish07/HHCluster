@@ -11,6 +11,7 @@ import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.LineRecordReader;
 import org.apache.hadoop.mapred.RecordReader;
+import org.apache.hadoop.mapred.Reporter;
 
 import edu.ub.ahstfg.hadoop.ParamSet;
 import edu.ub.ahstfg.io.index.DocumentDescriptor;
@@ -19,7 +20,7 @@ import edu.ub.ahstfg.utils.Utils;
 
 public class IndexRecordReader implements RecordReader<IntWritable, ArrayWritable> {
     
-    public static final String REPORTER_GROUP = "Index record reader";
+    private static final String REPORTER_GROUP = "IndexRecordReader report";
     
     private LineRecordReader lineReader;
     private LongWritable lineKey;
@@ -29,8 +30,12 @@ public class IndexRecordReader implements RecordReader<IntWritable, ArrayWritabl
     
     private int iMapper;
     
-    public IndexRecordReader(JobConf job, FileSplit input)
+    private Reporter reporter;
+    
+    public IndexRecordReader(JobConf job, FileSplit input, Reporter reporter)
             throws IOException {
+        this.reporter = reporter;
+        
         lineReader = new LineRecordReader(job, input);
         lineKey    = lineReader.createKey();
         lineValue  = lineReader.createValue();
@@ -38,7 +43,8 @@ public class IndexRecordReader implements RecordReader<IntWritable, ArrayWritabl
         numMachines    = job.getInt(ParamSet.NUM_MACHINES, 10);
         numDocs        = job.getInt(ParamSet.NUM_DOCS, 1000);
         qDocsPerMapper = numDocs / numMachines;
-        rDocsPerMapper = numDocs - qDocsPerMapper;
+        rDocsPerMapper = numDocs - (qDocsPerMapper * numMachines);
+        
         fillDocsPerMapper();
     }
     
@@ -57,7 +63,9 @@ public class IndexRecordReader implements RecordReader<IntWritable, ArrayWritabl
     @Override
     public synchronized boolean next(IntWritable key, ArrayWritable value)
             throws IOException {
-        if(iMapper >= numMachines) { return false; }
+        if(iMapper >= numMachines) {
+            return false;
+        }
         key.set(iMapper);
         int nDocs = docsPerMapper[iMapper];
         Writable[] outSet = new Writable[nDocs];

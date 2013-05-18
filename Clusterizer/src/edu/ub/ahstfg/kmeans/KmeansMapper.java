@@ -39,7 +39,6 @@ Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
     public void map(IntWritable key, ArrayWritable value,
             OutputCollector<IntWritable, DocumentDistance> output,
             Reporter reporter) throws IOException {
-        reporter.incrCounter(REPORTER_GROUP, "Num mappers", 1);
         
         this.output   = output;
         this.reporter = reporter;
@@ -71,7 +70,6 @@ Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
         double finalDistance;
         int finalCentroid;
         for(int iDoc = 0; iDoc < ws.length; iDoc++) {
-            reporter.incrCounter(REPORTER_GROUP, "Num docs", 1);
             doc = (DocumentDescriptor)ws[iDoc];
             finalDistance = -1.0;
             finalCentroid = -1;

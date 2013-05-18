@@ -19,7 +19,7 @@ public class IndexInputFormat extends FileInputFormat<IntWritable, ArrayWritable
     public RecordReader<IntWritable, ArrayWritable> getRecordReader(InputSplit input,
             JobConf job, Reporter reporter) throws IOException {
         reporter.setStatus(input.toString());
-        return new IndexRecordReader(job, (FileSplit) input);
+        return new IndexRecordReader(job, (FileSplit) input, reporter);
     }
     
     @Override
