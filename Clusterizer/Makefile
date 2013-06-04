@@ -40,7 +40,7 @@ JAVA_DIR       = /Users/alberto/Desktop/cluster_test/java
 JAR_DIR        = ~/Desktop/cluster_test/Clusterizer.jar
 
 MAIN_CLASS     = edu.ub.ahstfg.clusterizer.Clusterizer
-ARGS           = 3 0.0 1.0 4
+ARGS           = 3 0.0 1.0 4 hdfs://localhost:9000/
 
 INPUT_DIR      = ~/Desktop/testWordCount/output
 INPUT_FILES    = /*

@@ -11,18 +11,33 @@ import org.apache.hadoop.io.Text;
 
 import edu.ub.ahstfg.io.WritableConverter;
 
+/**
+ * Document representation. Used in read/write indexed documents.
+ * @author Alberto Huelamo Segura
+ */
 public class DocumentDescriptor implements IndexRecord {
+    
+    public static final boolean IS_DOCUMENT = true;
     
     private String url;
     private long[] termFreq;
     private long[] keyFreq;
     
+    /**
+     * Unparametrized constructor.
+     */
     public DocumentDescriptor() {
         url = "";
         termFreq = new long[1];
         keyFreq = new long[1];
     }
     
+    /**
+     * Parametrized constructor.
+     * @param url Document URL.
+     * @param termFreq Term frequency vector.
+     * @param keyFreq Keyword frequency vector.
+     */
     public DocumentDescriptor(String url, long[] termFreq, long[] keyFreq) {
         this.url = url;
         this.termFreq = termFreq;
@@ -32,17 +47,29 @@ public class DocumentDescriptor implements IndexRecord {
     
     @Override
     public boolean isDocument() {
-        return IndexRecord.DOCUMENT;
+        return IS_DOCUMENT;
     }
     
+    /**
+     * Gets the document URL.
+     * @return The URL of the document.
+     */
     public String getUrl() {
         return url;
     }
     
+    /**
+     * Gets the document term frequency.
+     * @return The term frequency vector of the document.
+     */
     public long[] getTermFreq() {
         return termFreq;
     }
     
+    /**
+     * Gets the document keyword frequency.
+     * @return The keyqord frequency vector of the document.
+     */
     public long[] getKeyFreq() {
         return keyFreq;
     }

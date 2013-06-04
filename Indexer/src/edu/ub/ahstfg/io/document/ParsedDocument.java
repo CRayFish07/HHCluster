@@ -10,49 +10,79 @@ import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
+/**
+ * Document representation passed between map and reduce indexing phases.
+ * @author Alberto Huelamo Segura
+ */
 public class ParsedDocument implements Writable {
-
+    
     private static final LongWritable ONE() {
         return new LongWritable(1);
     }
-
+    
     private Text url;
     private MapWritable terms;
     private MapWritable keywords;
-
+    
+    /**
+     * Unparametrized constructor.
+     */
     public ParsedDocument() {
         url = new Text();
         terms = new MapWritable();
         keywords = new MapWritable();
     }
-
+    
+    /**
+     * Instances new document specifying its URL.
+     * @param url Document URL.
+     */
     public ParsedDocument(Text url) {
         this();
         this.url = url;
     }
-
+    
+    /**
+     * Instances new document specifying its URL.
+     * @param url Document URL.
+     */
     public ParsedDocument(String url) {
         this(new Text(url));
     }
-
+    
+    /**
+     * Adds a new term. If the term exists increases their frequency.
+     * @param term Term to add.
+     */
     public void addTerm(Text term) {
         if (terms.containsKey(term)) {
             LongWritable n = (LongWritable) terms.get(term);
             n.set(n.get() + 1);
-            // terms.put(term, new LongWritable(n.get() + 1));
         } else {
             terms.put(term, ONE());
         }
     }
-
+    
+    /**
+     * Adds a new term. If the term exists increases their frequency.
+     * @param term Term to add.
+     */
     public void addTerm(String term) {
         addTerm(new Text(term));
     }
-
+    
+    /**
+     * Gets document url.
+     * @return The url of the document.
+     */
     public Text getUrl() {
         return url;
     }
-
+    
+    /**
+     * Gets the HashMap containing term frequency.
+     * @return Term frequency HashMap.
+     */
     public HashMap<String, Long> getTermMap() {
         HashMap<String, Long> ret = new HashMap<String, Long>();
         Text t;
@@ -64,7 +94,11 @@ public class ParsedDocument implements Writable {
         }
         return ret;
     }
-
+    
+    /**
+     * Builds and gets a vector with added terms.
+     * @return The term vector.
+     */
     public String[] getTermVector() {
         String[] ret = new String[terms.size()];
         Text t;
@@ -76,7 +110,11 @@ public class ParsedDocument implements Writable {
         }
         return ret;
     }
-
+    
+    /**
+     * Builds and gets a vector with added keywords.
+     * @return The keyword vector.
+     */
     public long[] getTermFreqVector() {
         long[] ret = new long[terms.size()];
         Text t;
@@ -90,21 +128,32 @@ public class ParsedDocument implements Writable {
         }
         return ret;
     }
-
+    
+    /**
+     * Adds a new keyword. If the keyword exists increases their frequency.
+     * @param term Keyword to add.
+     */
     public void addKeyword(Text keyword) {
         if (keywords.containsKey(keyword)) {
             LongWritable n = (LongWritable) keywords.get(keyword);
             n.set(n.get() + 1);
-            // keywords.put(keyword, new LongWritable(n.get() + 1));
         } else {
             keywords.put(keyword, ONE());
         }
     }
-
+    
+    /**
+     * Adds a new keyword. If the keyword exists increases their frequency.
+     * @param term Keyword to add.
+     */
     public void addKeyword(String keyword) {
         addKeyword(new Text(keyword));
     }
-
+    
+    /**
+     * Gets the HashMap containing keyword frequency.
+     * @return Keyword frequency HashMap.
+     */
     public HashMap<String, Long> getKeywordMap() {
         HashMap<String, Long> ret = new HashMap<String, Long>();
         Text t;
@@ -116,19 +165,19 @@ public class ParsedDocument implements Writable {
         }
         return ret;
     }
-
+    
     @Override
     public void readFields(DataInput input) throws IOException {
         url.readFields(input);
         terms.readFields(input);
         keywords.readFields(input);
     }
-
+    
     @Override
     public void write(DataOutput output) throws IOException {
         url.write(output);
         terms.write(output);
         keywords.write(output);
     }
-
+    
 }

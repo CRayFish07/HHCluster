@@ -19,7 +19,14 @@ import org.commoncrawl.hadoop.mapred.ArcInputFormat;
 import edu.ub.ahstfg.indexer.mapred.IndexOutputFormat;
 import edu.ub.ahstfg.io.document.ParsedDocument;
 import edu.ub.ahstfg.io.index.IndexRecord;
+import edu.ub.ahstfg.utils.Utils;
 
+/**
+ * Indexer launch class.
+ * This class sets up Hadoop environment to indexer job execution.
+ * @author Albert Huelamo Segura
+ *
+ */
 public class Indexer extends Configured implements Tool {
     
     private static final Logger LOG = Logger.getLogger(Indexer.class);
@@ -52,7 +59,6 @@ public class Indexer extends Configured implements Tool {
         FileOutputFormat.setCompressOutput(job, false);
         
         LOG.info("Setting input format.");
-        // job.setInputFormat(TextInputFormat.class);
         job.setInputFormat(ArcInputFormat.class);
         LOG.info("Setting output format.");
         job.setOutputFormat(IndexOutputFormat.class);
@@ -62,11 +68,9 @@ public class Indexer extends Configured implements Tool {
         job.setOutputValueClass(IndexRecord.class);
         
         LOG.info("Setting mapper and reducer.");
-        // job.setMapperClass(WordCountTextInputMapper.class);
         job.setMapperClass(IndexerMapper.class);
         job.setMapOutputValueClass(ParsedDocument.class);
         job.setReducerClass(IndexerReducer.class);
-        // job.setNumReduceTasks(1);
         
         if (JobClient.runJob(job).isSuccessful()) {
             return 0;
@@ -76,6 +80,11 @@ public class Indexer extends Configured implements Tool {
     }
     
     public static void main(String[] args) {
+        if(args.length != 1) {
+            LOG.error("Args: <Namenode adress>");
+            System.exit(-1);
+        }
+        Utils.HDFS_HOST = args[0];
         int res;
         try {
             res = ToolRunner.run(new Configuration(), new Indexer(), args);

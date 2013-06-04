@@ -14,14 +14,20 @@ import edu.ub.ahstfg.kmeans.KmeansIteration;
 import edu.ub.ahstfg.kmeans.document.DocumentCentroid;
 import edu.ub.ahstfg.utils.Utils;
 
+/**
+ * Clusterizer main application class.
+ * Controls K-means iterations execution.
+ * @author Alberto Huelamo Segura
+ */
 public class Clusterizer {
     
     private static final Logger LOG = Logger.getLogger(Clusterizer.class);
     
-    private static final int P_K        = 0;
-    private static final int W_KEYWORDS = 1;
-    private static final int W_TERMS    = 2;
-    private static final int N_MACHINES = 3;
+    private static final int P_K              = 0;
+    private static final int W_KEYWORDS       = 1;
+    private static final int W_TERMS          = 2;
+    private static final int N_MACHINES       = 3;
+    private static final int NAMENODE_ADDRESS = 4;
     
     private ParamSet params;
     
@@ -30,6 +36,12 @@ public class Clusterizer {
     private int nIter;
     private boolean finish;
     
+    /**
+     * Sole constructor.
+     * @param K Number of clusters.
+     * @param args Rest of arguments.
+     * @throws IOException
+     */
     public Clusterizer(int K, String args[]) throws IOException {
         LOG.info("Initiating...");
         params    = new ParamSet();
@@ -58,23 +70,23 @@ public class Clusterizer {
         
         params.setFloat(ParamSet.WEIGHT_KEYWORDS, Float.valueOf(args[W_KEYWORDS]));
         params.setFloat(ParamSet.WEIGHT_TERMS   , Float.valueOf(args[W_TERMS]));
-        LOG.info("Setted feature weights. wKeywords = " + args[W_KEYWORDS] +
-                ", wTerms = " + args[W_TERMS]);
+        LOG.info("Setted feature weights. wKeywords = " + args[W_KEYWORDS] + ", wTerms = " + args[W_TERMS]);
         
         params.setInt(ParamSet.NUM_MACHINES, Integer.valueOf(args[N_MACHINES]));
         LOG.info("Number of machines = " + args[N_MACHINES]);
     }
     
+    /**
+     * Runs clustering process.
+     */
     public void engage() {
         int res;
         String oldCentroidsDir, newCentroidsDir;
         do {
             nIter++;
             LOG.info("Iteration " + nIter + " > Begin.");
-            oldCentroidsDir = Centroids.CENTROIDS_DIR_PREFIX
-                    + String.valueOf(nIter);
-            newCentroidsDir = Centroids.CENTROIDS_DIR_PREFIX
-                    + String.valueOf(nIter + 1);
+            oldCentroidsDir = Centroids.CENTROIDS_DIR_PREFIX + String.valueOf(nIter);
+            newCentroidsDir = Centroids.CENTROIDS_DIR_PREFIX + String.valueOf(nIter + 1);
             params.setString(ParamSet.OLD_CENTROIDS_PATH, oldCentroidsDir);
             params.setString(ParamSet.NEW_CENTROIDS_PATH, newCentroidsDir);
             LOG.info("Iteration " + nIter + " > Old centroids dir setted to " + oldCentroidsDir);
@@ -116,23 +128,23 @@ public class Clusterizer {
     
     private int readNumDocs() throws IOException {
         FileSystem fs = Utils.accessHDFS();
-        FSDataInputStream in = fs.open(
-                new Path(FeatureDescriptor.NUM_DOCS_PATH));
+        FSDataInputStream in = fs.open(new Path(FeatureDescriptor.NUM_DOCS_PATH));
         int ret = in.readInt();
         in.close();
         return ret;
     }
     
     public static void main(String[] args) {
-        if(args.length != 4) {
-            LOG.error("Args: <K> <keywords_weight> <term_weight> <num_machines>");
+        if(args.length != 5) {
+            LOG.error("Args: <K> <keywords_weight> <term_weight> <num_machines> <Namenode adress>");
             return;
         }
+        Utils.HDFS_HOST = args[NAMENODE_ADDRESS];
         int k = 0;
         try {
             k = Integer.valueOf(args[P_K]);
         } catch(NumberFormatException ex) {
-            LOG.error("Args: <K> <keywords_weight> <term_weight> <num_machines>");
+            LOG.error("Args: <K> <keywords_weight> <term_weight> <num_machines> <Namenode adress>");
             LOG.error("K must be an integer.");
             return;
         }

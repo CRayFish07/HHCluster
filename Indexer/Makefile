@@ -41,13 +41,13 @@ JAVA_DIR       = /Users/alberto/Desktop/testWordCount/java
 JAR_DIR        = ~/Desktop/testWordCount/Indexer.jar
 
 MAIN_CLASS     = edu.ub.ahstfg.indexer.Indexer
-#ARGS           = input output
+ARGS           = hdfs://localhost:9000/
 
 INPUT_DIR      = ~/Desktop/testWordCount/idx_input
 INPUT_FILES    = /*.arc.gz
 OUTPUT_DIR     = ~/Desktop/testWordCount/
 
-RUN            = $(HADOOP_EXE) jar $(JAR_DIR)
+RUN            = $(HADOOP_EXE) jar $(JAR_DIR) $(ARGS)
 
 all: clean jar
 

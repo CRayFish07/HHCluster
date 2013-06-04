@@ -24,8 +24,16 @@ import edu.ub.ahstfg.hadoop.ParamSet;
 import edu.ub.ahstfg.indexer.mapred.IndexInputFormat;
 import edu.ub.ahstfg.io.DocumentDistance;
 
+/**
+ * Sets up a new hadoop job for a K-means iteration.
+ * @author Alberto Huelamo Segura
+ */
 public class KmeansIteration extends Configured implements Tool {
     
+    /**
+     * Filters the input files.
+     * @author Alberto Huelamo Segura
+     */
     public static class SampleFilter implements PathFilter {
         
         private static int count =         0;
@@ -58,6 +66,13 @@ public class KmeansIteration extends Configured implements Tool {
     
     private ParamSet params;
     
+    /**
+     * Sole constructor.
+     * @param nIter Iteration number.
+     * @param inputPath Data source path.
+     * @param outputPath Data output path.
+     * @param args Rest of arguments.
+     */
     public KmeansIteration(int nIter, String inputPath, String outputPath, ParamSet args) {
         this.nIter = nIter;
         this.inputPath = inputPath;
@@ -115,6 +130,14 @@ public class KmeansIteration extends Configured implements Tool {
         }
     }
     
+    /**
+     * Sets up and runs a new K-means iteration job.
+     * @param nIter Iteration number.
+     * @param inputPath Data source path.
+     * @param outputPath Data output path.
+     * @param args Rest of arguments.
+     * @return Job return code.
+     */
     public static int runIteration(int nIter, String inputPath,
             String outputPath, ParamSet args) {
         int res;

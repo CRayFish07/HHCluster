@@ -17,6 +17,11 @@ import edu.ub.ahstfg.io.index.DocumentDescriptor;
 import edu.ub.ahstfg.kmeans.document.DocumentCentroid;
 import edu.ub.ahstfg.utils.Metrics;
 
+/**
+ * K-means iteration mapper.
+ * Assigns each document to a cluster.
+ * @author Alberto Huelamo Segura
+ */
 public class KmeansMapper extends MapReduceBase implements
 Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
     

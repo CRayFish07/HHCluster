@@ -18,6 +18,11 @@ import edu.ub.ahstfg.io.index.DocumentDescriptor;
 import edu.ub.ahstfg.io.index.FeatureDescriptor;
 import edu.ub.ahstfg.utils.Utils;
 
+/**
+ * Index record reader.
+ * Reads indexed document descriptors.
+ * @author Alberto Huelamo Segura
+ */
 public class IndexRecordReader implements RecordReader<IntWritable, ArrayWritable> {
     
     private static final String REPORTER_GROUP = "IndexRecordReader report";
@@ -32,6 +37,13 @@ public class IndexRecordReader implements RecordReader<IntWritable, ArrayWritabl
     
     private Reporter reporter;
     
+    /**
+     * Sole constructor.
+     * @param job Job reading the records.
+     * @param input Split where are the records.
+     * @param reporter Job reporter.
+     * @throws IOException
+     */
     public IndexRecordReader(JobConf job, FileSplit input, Reporter reporter)
             throws IOException {
         this.reporter = reporter;

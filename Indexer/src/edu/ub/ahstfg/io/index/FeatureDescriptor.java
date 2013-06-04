@@ -15,7 +15,14 @@ import org.apache.hadoop.io.Text;
 import edu.ub.ahstfg.io.WritableConverter;
 import edu.ub.ahstfg.utils.Utils;
 
+/**
+ * Representation of the features. It is used to store which keywords and terms
+ * are in the index.
+ * @author Alberto Huelamo Segura
+ */
 public class FeatureDescriptor implements IndexRecord {
+    
+    public static final boolean IS_FEATURE = false;
     
     public static final String KEY = "<<<FeatureDescriptor>>>";
     public static final String NUM_FEATURES_PATH = "n_features.param";
@@ -24,11 +31,19 @@ public class FeatureDescriptor implements IndexRecord {
     private String[] terms;
     private String[] keywords;
     
+    /**
+     * Unparametrized constructor.
+     */
     public FeatureDescriptor() {
         terms = new String[1];
         keywords = new String[1];
     }
     
+    /**
+     * Parametrized constructor.
+     * @param terms Term list.
+     * @param keywords Keyword list.
+     */
     public FeatureDescriptor(String[] terms, String[] keywords) {
         this.terms = terms;
         this.keywords = keywords;
@@ -36,13 +51,21 @@ public class FeatureDescriptor implements IndexRecord {
     
     @Override
     public boolean isDocument() {
-        return IndexRecord.FEATURE;
+        return IS_FEATURE;
     }
     
+    /**
+     * Gets the term list.
+     * @return A term vector.
+     */
     public String[] getTerms() {
         return terms;
     }
     
+    /**
+     * Gets the keyword list.
+     * @return A keyword vector.
+     */
     public String[] getKeywords() {
         return keywords;
     }
@@ -81,6 +104,9 @@ public class FeatureDescriptor implements IndexRecord {
         out.writeBytes("\n");
     }
     
+    /**
+     * Writes in the HDFS the number of features.
+     */
     public void writeNumFeatures() throws IOException {
         FileSystem fs = Utils.accessHDFS();
         FSDataOutputStream out = fs.create(new Path(NUM_FEATURES_PATH));
@@ -89,6 +115,12 @@ public class FeatureDescriptor implements IndexRecord {
         out.close();
     }
     
+    /**
+     * Reads from the HDFS the number of features.
+     * @param features 2 position integer array to store the number of features.
+     * @throws IllegalArgumentException Thrown if the vector has not length 2.
+     * @throws IOException Thrown if there is a problem with communication.
+     */
     public static void getNumFeatures(int[] features)
             throws IllegalArgumentException, IOException {
         if(features.length != 2) {

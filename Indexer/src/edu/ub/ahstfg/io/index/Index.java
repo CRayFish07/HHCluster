@@ -14,6 +14,10 @@ import org.apache.hadoop.mapred.Reporter;
 
 import edu.ub.ahstfg.io.WritableConverter;
 
+/**
+ * Index class. Groups all terms and keywords and constructs the feature matrix.
+ * @author Alberto Huelamo Segura
+ */
 public class Index implements Writable {
     
     private ArrayList<String> terms;
@@ -26,6 +30,10 @@ public class Index implements Writable {
     
     private Reporter reporter;
     
+    /**
+     * Sole constructor.
+     * @param reporter Hadoop job reporter.
+     */
     public Index(Reporter reporter) {
         terms = new ArrayList<String>();
         termFreq = new HashMap<String, ArrayList<Long>>();
@@ -40,6 +48,13 @@ public class Index implements Writable {
         reporter.incrCounter("Index report", "Removed terms", 0);
     }
     
+    /**
+     * Adds a term from a document to the index.
+     * If the term already exists increases their frequency.
+     * @param term Term to add.
+     * @param url Document where term appears.
+     * @param freq Frequency to increase.
+     */
     public void addTerm(final String term, final String url, final long freq) {
         addTermAppearance(url, term);
         if (!termFreq.containsKey(url)) {
@@ -69,6 +84,11 @@ public class Index implements Writable {
         }
     }
     
+    /**
+     * Adds a document to term appearace. Used to filter.
+     * @param url Docuemnt URL to add.
+     * @param term Term which appears in document.
+     */
     private void addTermAppearance(final String url, final String term) {
         if (!termAppearance.containsKey(term)) {
             termAppearance.put(term, new ArrayList<String>());
@@ -79,10 +99,18 @@ public class Index implements Writable {
         }
     }
     
+    /**
+     * Gets the term vector.
+     * @return An array of terms.
+     */
     public String[] getTermVector() {
         return terms.toArray(new String[terms.size()]);
     }
     
+    /**
+     * Gets the document urls which have terms.
+     * @return An array of urls.
+     */
     public String[] getDocumentTermVector() {
         String[] ret = new String[termFreq.size()];
         int i = 0;
@@ -93,6 +121,10 @@ public class Index implements Writable {
         return ret;
     }
     
+    /**
+     * Gets the term frequency matrix.
+     * @return An array of arrays with frequencies. Rows represents the documents.
+     */
     public long[][] getTermFreqMatrix() {
         long[][] ret = new long[termFreq.size()][terms.size()];
         int i = 0, j = 0;
@@ -109,6 +141,10 @@ public class Index implements Writable {
         return ret;
     }
     
+    /**
+     * Removes a term from all documents.
+     * @param term The term to remove.
+     */
     public void removeTerm(String term) {
         int idx = terms.indexOf(term);
         if(idx > 0) {
@@ -122,6 +158,13 @@ public class Index implements Writable {
         }
     }
     
+    /**
+     * Filters the index. Removes those terms which appears in less documents
+     * than a percentage and those which appears in more documents than other
+     * percentage.
+     * @param infCote Terms which appear in less documents than this percentage will be removed.
+     * @param supCote Terms which appear in more documents than this percentage will be removed.
+     */
     public void filter(double infCote, double supCote) {
         int nDocs, totalDocs = termFreq.size();
         double rate;
@@ -135,6 +178,13 @@ public class Index implements Writable {
         }
     }
     
+    /**
+     * Adds a keyword from a document to the index.
+     * If the keyword already exists increases their frequency.
+     * @param keyword Keyword to add.
+     * @param url Document where keyword appears.
+     * @param freq Frequency to increase.
+     */
     public void addKeyword(final String keyword, final String url,
             final long freq) {
         if (!keywordFreq.containsKey(url)) {
@@ -164,10 +214,18 @@ public class Index implements Writable {
         }
     }
     
+    /**
+     * Gets the vector of the added keywords.
+     * @return An array with the keywords.
+     */
     public String[] getKeywordVector() {
         return keywords.toArray(new String[keywords.size()]);
     }
     
+    /**
+     * Gets the keyword frequency matrix.
+     * @return An array of arrays with frequencies. Rows represents the documents.
+     */
     public long[][] getKeywordFreqMatrix() {
         long[][] ret = new long[termFreq.size()][terms.size()];
         int i = 0, j = 0;

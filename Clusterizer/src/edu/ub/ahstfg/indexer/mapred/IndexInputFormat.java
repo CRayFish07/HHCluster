@@ -13,6 +13,10 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.Reporter;
 
+/**
+ * Hadoop input format to read IndexRecords.
+ * @author Alberto Huelamo Segura
+ */
 public class IndexInputFormat extends FileInputFormat<IntWritable, ArrayWritable> {
     
     @Override

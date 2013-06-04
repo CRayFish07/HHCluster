@@ -13,14 +13,14 @@ import edu.ub.ahstfg.io.index.Index;
 
 @Deprecated
 public class IndexWriter implements RecordWriter<Text, Index> {
-
+    
     private DataOutputStream out;
-
+    
     public IndexWriter(DataOutputStream out) throws IOException {
         this.out = out;
         out.writeBytes("<index>\n");
     }
-
+    
     @Override
     public void close(Reporter reporter) throws IOException {
         try {
@@ -29,23 +29,23 @@ public class IndexWriter implements RecordWriter<Text, Index> {
             out.close();
         }
     }
-
+    
     @Override
     public void write(Text key, Index value) throws IOException {
         boolean nullKey = key == null || (Writable) key instanceof NullWritable;
         boolean nullValue = value == null
                 || (Writable) value instanceof NullWritable;
-
+        
         if (nullKey && nullValue) {
             return;
         }
-
+        
         // if (!nullValue) {
         writeIndex(value);
         // }
-
+        
     }
-
+    
     private void writeIndex(Index index) throws IOException {
         final String[] terms = index.getTermVector();
         final String[] keywords = index.getKeywordVector();
@@ -82,5 +82,5 @@ public class IndexWriter implements RecordWriter<Text, Index> {
             out.writeBytes("  </document>\n");
         }
     }
-
+    
 }

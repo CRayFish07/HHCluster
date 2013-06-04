@@ -5,15 +5,15 @@ import org.apache.hadoop.io.Text;
 
 @Deprecated
 public class TextArrayWritable extends ArrayWritable {
-
+    
     public TextArrayWritable() {
         super(Text.class);
     }
-
+    
     public TextArrayWritable(Text[] values) {
         super(Text.class, values);
     }
-
+    
     public TextArrayWritable(String[] values) {
         super(Text.class);
         Text[] vt = new Text[values.length];
@@ -22,5 +22,5 @@ public class TextArrayWritable extends ArrayWritable {
         }
         super.set(vt);
     }
-
+    
 }

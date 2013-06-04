@@ -18,6 +18,11 @@ import edu.ub.ahstfg.io.DocumentDistance;
 import edu.ub.ahstfg.io.index.DocumentDescriptor;
 import edu.ub.ahstfg.kmeans.document.DocumentCentroid;
 
+/**
+ * K-means iteration reducer.
+ * Computes the new centroids.
+ * @author Alberto Huelamo Segura
+ */
 public class KmeansReducer extends MapReduceBase implements
 Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
     

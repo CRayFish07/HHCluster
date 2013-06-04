@@ -20,6 +20,12 @@ import edu.ub.ahstfg.io.index.Index;
 import edu.ub.ahstfg.io.index.IndexRecord;
 import edu.ub.ahstfg.utils.Utils;
 
+/**
+ * Reducer for indexer.
+ * Performs a term/keyword union and filters non common and common features.
+ * @author Alberto Huelamo Segura
+ *
+ */
 public class IndexerReducer extends MapReduceBase implements
 Reducer<Text, ParsedDocument, Text, IndexRecord> {
     
@@ -58,7 +64,7 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
         
         index.filter(0.2, 0.8);
         
-        String[] terms = index.getTermVector();
+        String[] terms    = index.getTermVector();
         String[] keywords = index.getKeywordVector();
         
         reporter.incrCounter(REDUCER_REPORT, "Term number", terms.length);
@@ -67,9 +73,9 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
         FeatureDescriptor fd = new FeatureDescriptor(terms, keywords);
         output.collect(new Text("<<<FeatureDescriptor>>>"), fd);
         
-        String[] urls = index.getDocumentTermVector();
+        String[] urls     = index.getDocumentTermVector();
         long[][] termFreq = index.getTermFreqMatrix();
-        long[][] keyFreq = index.getKeywordFreqMatrix();
+        long[][] keyFreq  = index.getKeywordFreqMatrix();
         for (int i = 0; i < urls.length; i++) {
             output.collect(new Text(urls[i]), new DocumentDescriptor(urls[i],
                     termFreq[i], keyFreq[i]));

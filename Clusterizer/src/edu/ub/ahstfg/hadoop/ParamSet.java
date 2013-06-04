@@ -4,6 +4,10 @@ import java.util.HashMap;
 
 import org.apache.hadoop.mapred.JobConf;
 
+/**
+ * Parameter storage. It is ready to transfer the parameters to Hadoop job.
+ * @author Alberto Huelamo Segura
+ */
 public class ParamSet {
     
     // Param keys
@@ -26,36 +30,73 @@ public class ParamSet {
     private HashMap<String, Integer> ints;
     private HashMap<String, Float>   floats;
     
+    /**
+     * Sole constructor.
+     */
     public ParamSet() {
         strings = new HashMap<String, String>();
         ints    = new HashMap<String, Integer>();
         floats  = new HashMap<String, Float>();
     }
     
+    /**
+     * Gets a String parameter.
+     * @param key Parameter key.
+     * @return String parameter.
+     */
     public String getString(String key) {
         return strings.get(key);
     }
     
+    /**
+     * Sets a String parameter.
+     * @param key Parameter key.
+     * @param value Parameter value.
+     */
     public void setString(String key, String value) {
         strings.put(key, value);
     }
     
+    /**
+     * Gets an integer parameter.
+     * @param key Parameter key.
+     * @return String parameter.
+     */
     public int getInt(String key) {
         return ints.get(key);
     }
     
+    /**
+     * Sets an integer parameter.
+     * @param key Parameter key.
+     * @param value Parameter value.
+     */
     public void setInt(String key, int value) {
         ints.put(key, value);
     }
     
+    /**
+     * Gets a float parameter.
+     * @param key Parameter key.
+     * @return String parameter.
+     */
     public float getFloat(String key) {
         return floats.get(key);
     }
     
+    /**
+     * Sets a float parameter.
+     * @param key Parameter key.
+     * @param value Parameter value.
+     */
     public void setFloat(String key, float value) {
         floats.put(key, value);
     }
     
+    /**
+     * Transfers the parameters to a Hadoop job.
+     * @param job Job where parameters will be transfered.
+     */
     public void toJobConf(JobConf job) {
         for(String key: strings.keySet()) {
             job.set(key, strings.get(key));

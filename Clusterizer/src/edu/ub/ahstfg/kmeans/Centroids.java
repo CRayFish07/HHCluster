@@ -7,6 +7,10 @@ import org.apache.log4j.Logger;
 
 import edu.ub.ahstfg.kmeans.document.DocumentCentroid;
 
+/**
+ * Centroid set management class.
+ * @author Alberto Huelamo Segura
+ */
 public class Centroids {
     
     private static final Logger LOG = Logger.getLogger(Centroids.class);
@@ -19,16 +23,31 @@ public class Centroids {
     
     private Class<? extends Centroid> centroidClass;
     
+    /**
+     * Sole constructor.
+     * @param K Number of clusters/centroids.
+     * @param centroidClass Centroid type.
+     */
     public Centroids(int K, Class<? extends Centroid> centroidClass) {
         this.K = K;
         this.centroidClass = centroidClass;
         centroids = new Centroid[K];
     }
     
+    /**
+     * Gets a centroid giving their ID.
+     * @param i Centroid ID.
+     * @return The centroid with specified ID.
+     */
     public Centroid get(int i) {
         return centroids[i];
     }
     
+    /**
+     * Initializes all document centroids with random numbers
+     * @param keywords Number of keywords.
+     * @param terms Number of terms.
+     */
     public void randomDocumentInit(int keywords, int terms) {
         for (int i = 0; i < centroids.length; i++) {
             centroids[i] = new DocumentCentroid(DocumentCentroid.RANDOM,
@@ -36,6 +55,11 @@ public class Centroids {
         }
     }
     
+    /**
+     * Measures the distances between iterations and indicates if the clustering
+     * is finished.
+     * @return True if the centroids have not moved.
+     */
     public boolean isFinished() {
         for(Centroid c: centroids) {
             LOG.info("Distance: " + c.getDistance());
@@ -46,6 +70,11 @@ public class Centroids {
         return true;
     }
     
+    /**
+     * Writes centroid set in the HDFS.
+     * @param dir Directory to write.
+     * @throws IOException
+     */
     public void toHDFS(String dir) throws IOException {
         int i = 0;
         for (Centroid c : centroids) {
@@ -54,6 +83,11 @@ public class Centroids {
         }
     }
     
+    /**
+     * Reads centroids from the HDFS.
+     * @param dir Directory to read.
+     * @throws IOException
+     */
     public void fromHDFS(String dir)
             throws IOException {
         for (int i = 0; i < K; i++) {

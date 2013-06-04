@@ -20,6 +20,10 @@ import edu.ub.ahstfg.kmeans.Centroid;
 import edu.ub.ahstfg.utils.Metrics;
 import edu.ub.ahstfg.utils.Utils;
 
+/**
+ * Centroid implementation for document features.
+ * @author Alberto Huelamo Segura
+ */
 public class DocumentCentroid implements Centroid, Writable {
     
     private static final Logger LOG = Logger.getLogger(DocumentCentroid.class);
@@ -32,10 +36,19 @@ public class DocumentCentroid implements Centroid, Writable {
     
     private double distance; //distance from previous centroid
     
+    /**
+     * Default argument constructor.
+     */
     public DocumentCentroid() {
         this(10, 10);
     }
     
+    /**
+     * Parametrized constructor.
+     * @param random True for randon init.
+     * @param keywords Number of keywords.
+     * @param terms Number of terms.
+     */
     public DocumentCentroid(boolean random, int keywords, int terms) {
         this(keywords, terms);
         if(random) {
@@ -49,20 +62,38 @@ public class DocumentCentroid implements Centroid, Writable {
         distance = 0.0;
     }
     
+    /**
+     * Parametrized constructor.
+     * @param keywords Number of keywords.
+     * @param terms Number of terms.
+     */
     public DocumentCentroid(int keywords, int terms) {
         keywordVector = new long[keywords];
         termVector = new long[terms];
     }
     
+    /**
+     * Parametrized constructor.
+     * @param keywordVector Keyword frequency.
+     * @param termVector Term frequency.
+     */
     public DocumentCentroid(long[] keywordVector, long[] termVector) {
         this.keywordVector = keywordVector;
         this.termVector = termVector;
     }
     
+    /**
+     * Gets keyword frequency vector.
+     * @return An array with keyword frequency.
+     */
     public long[] getKeywordVector() {
         return keywordVector;
     }
     
+    /**
+     * Gets term frequency vector.
+     * @return An array with term frequency.
+     */
     public long[] getTermVector() {
         return termVector;
     }
@@ -114,6 +145,13 @@ public class DocumentCentroid implements Centroid, Writable {
         in.close();
     }
     
+    /**
+     * Computes the distance with other centroid.
+     * @param other The other centroid.
+     * @param wk Keyword distance weight.
+     * @param wt Term distance weight.
+     * @return The distance.
+     */
     public double distance(DocumentCentroid other, float wk, float wt) {
         double keyDistance = Metrics.euclideanDistance(keywordVector,
                 other.keywordVector);
@@ -122,6 +160,14 @@ public class DocumentCentroid implements Centroid, Writable {
         return wk * keyDistance + wt * termDistance;
     }
     
+    /**
+     * Computes new centroid using mean of the frequencies.
+     * @param nKeywords Numeber of keywords.
+     * @param nTerms Number of terms.
+     * @param keys Keyword frequency assigned to centroid.
+     * @param terms Term frequency assigned to centroid.
+     * @return The new centroid.
+     */
     public static DocumentCentroid calculateCentroid(int nKeywords, int nTerms,
             ArrayList<long[]>keys, ArrayList<long[]> terms) {
         long[] keyFreq  = new long[nKeywords];

@@ -13,6 +13,11 @@ import org.apache.hadoop.util.Progressable;
 
 import edu.ub.ahstfg.io.index.IndexRecord;
 
+/**
+ * Output format for index files.
+ * @author Alberto Huelamo Segura
+ *
+ */
 public class IndexOutputFormat extends FileOutputFormat<Text, IndexRecord> {
     
     @Override
