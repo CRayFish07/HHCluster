@@ -12,7 +12,7 @@ public class Metrics {
      * @param q Secnd vector.
      * @return The euclidean distance between vectors.
      */
-    public static double euclideanDistance(long[] p, long[] q) {
+    public static double euclideanDistance(short[] p, short[] q) {
         if(p.length != q.length) {
             throw new IllegalArgumentException();
         }

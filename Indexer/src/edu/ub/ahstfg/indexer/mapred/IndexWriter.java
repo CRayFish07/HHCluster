@@ -50,8 +50,8 @@ public class IndexWriter implements RecordWriter<Text, Index> {
         final String[] terms = index.getTermVector();
         final String[] keywords = index.getKeywordVector();
         final String[] urls = index.getDocumentTermVector();
-        final long[][] termFreqs = index.getTermFreqMatrix();
-        final long[][] keywordFreqs = index.getKeywordFreqMatrix();
+        final short[][] termFreqs = index.getTermFreqMatrix();
+        final short[][] keywordFreqs = index.getKeywordFreqMatrix();
         out.writeBytes("  <keywords n=\"" + keywords.length + "\">\n    ");
         for (int i = 0; i < keywords.length; i++) {
             out.writeBytes(keywords[i] + ",");

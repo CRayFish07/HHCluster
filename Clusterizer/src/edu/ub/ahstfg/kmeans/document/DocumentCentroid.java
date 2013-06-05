@@ -31,8 +31,8 @@ public class DocumentCentroid implements Centroid, Writable {
     public static final boolean RANDOM           = true;
     public static final int     RANDOM_MAX_RANGE = 10;
     
-    private long[] keywordVector;
-    private long[] termVector;
+    private short[] keywordVector;
+    private short[] termVector;
     
     private double distance; //distance from previous centroid
     
@@ -68,8 +68,8 @@ public class DocumentCentroid implements Centroid, Writable {
      * @param terms Number of terms.
      */
     public DocumentCentroid(int keywords, int terms) {
-        keywordVector = new long[keywords];
-        termVector = new long[terms];
+        keywordVector = new short[keywords];
+        termVector = new short[terms];
     }
     
     /**
@@ -77,7 +77,7 @@ public class DocumentCentroid implements Centroid, Writable {
      * @param keywordVector Keyword frequency.
      * @param termVector Term frequency.
      */
-    public DocumentCentroid(long[] keywordVector, long[] termVector) {
+    public DocumentCentroid(short[] keywordVector, short[] termVector) {
         this.keywordVector = keywordVector;
         this.termVector = termVector;
     }
@@ -86,7 +86,7 @@ public class DocumentCentroid implements Centroid, Writable {
      * Gets keyword frequency vector.
      * @return An array with keyword frequency.
      */
-    public long[] getKeywordVector() {
+    public short[] getKeywordVector() {
         return keywordVector;
     }
     
@@ -94,7 +94,7 @@ public class DocumentCentroid implements Centroid, Writable {
      * Gets term frequency vector.
      * @return An array with term frequency.
      */
-    public long[] getTermVector() {
+    public short[] getTermVector() {
         return termVector;
     }
     
@@ -110,8 +110,8 @@ public class DocumentCentroid implements Centroid, Writable {
     
     @Override
     public void write(DataOutput out) throws IOException {
-        WritableConverter.longArray2ArrayWritable(keywordVector).write(out);
-        WritableConverter.longArray2ArrayWritable(termVector).write(out);
+        WritableConverter.shortArray2ArrayWritable(keywordVector).write(out);
+        WritableConverter.shortArray2ArrayWritable(termVector).write(out);
         DoubleWritable dist = new DoubleWritable(distance);
         dist.write(out);
     }
@@ -120,10 +120,10 @@ public class DocumentCentroid implements Centroid, Writable {
     public void readFields(DataInput in) throws IOException {
         ArrayWritable k = new ArrayWritable(LongWritable.class);
         k.readFields(in);
-        keywordVector = WritableConverter.arrayWritable2LongArray(k);
+        keywordVector = WritableConverter.arrayWritable2ShortArray(k);
         ArrayWritable t = new ArrayWritable(LongWritable.class);
         t.readFields(in);
-        termVector = WritableConverter.arrayWritable2LongArray(t);
+        termVector = WritableConverter.arrayWritable2ShortArray(t);
         DoubleWritable dist = new DoubleWritable();
         dist.readFields(in);
         distance = dist.get();
@@ -169,24 +169,24 @@ public class DocumentCentroid implements Centroid, Writable {
      * @return The new centroid.
      */
     public static DocumentCentroid calculateCentroid(int nKeywords, int nTerms,
-            ArrayList<long[]>keys, ArrayList<long[]> terms) {
-        long[] keyFreq  = new long[nKeywords];
+            ArrayList<short[]>keys, ArrayList<short[]> terms) {
+        short[] keyFreq  = new short[nKeywords];
         long sum;
         for(int j = 0; j < nKeywords; j++) {
             sum = 0;
             for(int i = 0; i < keys.size(); i++) {
                 sum += keys.get(i)[j];
             }
-            keyFreq[j] = sum / keys.size();
+            keyFreq[j] = (short) (sum / keys.size());
         }
         
-        long[] termFreq = new long[nTerms];
+        short[] termFreq = new short[nTerms];
         for(int j = 0; j < nTerms; j++) {
             sum = 0;
             for(int i = 0; i < terms.size(); i++) {
                 sum += terms.get(i)[j];
             }
-            termFreq[j] = sum / terms.size();
+            termFreq[j] = (short) (sum / terms.size());
         }
         
         return new DocumentCentroid(keyFreq, termFreq);

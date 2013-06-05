@@ -20,16 +20,16 @@ public class DocumentDescriptor implements IndexRecord {
     public static final boolean IS_DOCUMENT = true;
     
     private String url;
-    private long[] termFreq;
-    private long[] keyFreq;
+    private short[] termFreq;
+    private short[] keyFreq;
     
     /**
      * Unparametrized constructor.
      */
     public DocumentDescriptor() {
         url = "";
-        termFreq = new long[1];
-        keyFreq = new long[1];
+        termFreq = new short[1];
+        keyFreq = new short[1];
     }
     
     /**
@@ -38,7 +38,7 @@ public class DocumentDescriptor implements IndexRecord {
      * @param termFreq Term frequency vector.
      * @param keyFreq Keyword frequency vector.
      */
-    public DocumentDescriptor(String url, long[] termFreq, long[] keyFreq) {
+    public DocumentDescriptor(String url, short[] termFreq, short[] keyFreq) {
         this.url = url;
         this.termFreq = termFreq;
         // this.keyFreq = null;
@@ -62,7 +62,7 @@ public class DocumentDescriptor implements IndexRecord {
      * Gets the document term frequency.
      * @return The term frequency vector of the document.
      */
-    public long[] getTermFreq() {
+    public short[] getTermFreq() {
         return termFreq;
     }
     
@@ -70,7 +70,7 @@ public class DocumentDescriptor implements IndexRecord {
      * Gets the document keyword frequency.
      * @return The keyqord frequency vector of the document.
      */
-    public long[] getKeyFreq() {
+    public short[] getKeyFreq() {
         return keyFreq;
     }
     
@@ -81,17 +81,17 @@ public class DocumentDescriptor implements IndexRecord {
         url = t.toString();
         ArrayWritable buffer = new ArrayWritable(LongWritable.class);
         buffer.readFields(input);
-        termFreq = WritableConverter.arrayWritable2LongArray(buffer);
+        termFreq = WritableConverter.arrayWritable2ShortArray(buffer);
         buffer = new ArrayWritable(LongWritable.class);
         buffer.readFields(input);
-        keyFreq = WritableConverter.arrayWritable2LongArray(buffer);
+        keyFreq = WritableConverter.arrayWritable2ShortArray(buffer);
     }
     
     @Override
     public void write(DataOutput output) throws IOException {
         new Text(url).write(output);
-        WritableConverter.longArray2ArrayWritable(termFreq).write(output);
-        WritableConverter.longArray2ArrayWritable(keyFreq).write(output);
+        WritableConverter.shortArray2ArrayWritable(termFreq).write(output);
+        WritableConverter.shortArray2ArrayWritable(keyFreq).write(output);
     }
     
     @Override

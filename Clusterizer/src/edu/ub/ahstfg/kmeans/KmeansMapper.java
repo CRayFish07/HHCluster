@@ -76,26 +76,28 @@ Mapper<IntWritable, ArrayWritable, IntWritable, DocumentDistance> {
         int finalCentroid;
         for(int iDoc = 0; iDoc < ws.length; iDoc++) {
             doc = (DocumentDescriptor)ws[iDoc];
-            finalDistance = -1.0;
-            finalCentroid = -1;
-            for(int iCentroid = 0; iCentroid < K; iCentroid++) {
-                centroid = (DocumentCentroid)centroids.get(iCentroid);
-                termDistance = Metrics.euclideanDistance(doc.getTermFreq(),
-                        centroid.getTermVector());
-                if(haveKeywords) {
-                    keywordDistance = Metrics.euclideanDistance(doc.getKeyFreq(),
-                            centroid.getKeywordVector());
-                } else {
-                    keywordDistance = 0.0;
+            if(doc != null) {
+                finalDistance = -1.0;
+                finalCentroid = -1;
+                for(int iCentroid = 0; iCentroid < K; iCentroid++) {
+                    centroid = (DocumentCentroid)centroids.get(iCentroid);
+                    termDistance = Metrics.euclideanDistance(doc.getTermFreq(),
+                            centroid.getTermVector());
+                    if(haveKeywords) {
+                        keywordDistance = Metrics.euclideanDistance(doc.getKeyFreq(),
+                                centroid.getKeywordVector());
+                    } else {
+                        keywordDistance = 0.0;
+                    }
+                    docDistance = wKeywords * keywordDistance + wTerms * termDistance;
+                    if(finalDistance < 0 || finalDistance > docDistance) {
+                        finalDistance = docDistance;
+                        finalCentroid = iCentroid;
+                    }
                 }
-                docDistance = wKeywords * keywordDistance + wTerms * termDistance;
-                if(finalDistance < 0 || finalDistance > docDistance) {
-                    finalDistance = docDistance;
-                    finalCentroid = iCentroid;
-                }
+                output.collect(new IntWritable(finalCentroid), new DocumentDistance(doc, finalDistance));
+                fillCentroid(finalCentroid, 1);
             }
-            output.collect(new IntWritable(finalCentroid), new DocumentDistance(doc, finalDistance));
-            fillCentroid(finalCentroid, 1);
         }
         outVoidCentroids(output);
     }

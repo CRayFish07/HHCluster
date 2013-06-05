@@ -31,6 +31,8 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
     
     public static final String REDUCER_REPORT = "Reducer report";
     
+    private Index index;
+    
     @Override
     public void reduce(Text key, Iterator<ParsedDocument> values,
             OutputCollector<Text, IndexRecord> output, Reporter reporter)
@@ -40,11 +42,34 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
             return;
         }
         
-        Index index = new Index(reporter);
+        makeIndex(values, reporter);
+        
+        String[] terms    = index.getTermVector();
+        String[] keywords = index.getKeywordVector();
+        
+        reporter.incrCounter(REDUCER_REPORT, "Term number", terms.length);
+        reporter.incrCounter(REDUCER_REPORT, "Keyword number", keywords.length);
+        
+        FeatureDescriptor fd = new FeatureDescriptor(terms, keywords);
+        output.collect(new Text("<<<FeatureDescriptor>>>"), fd);
+        
+        String[] urls     = index.getDocumentTermVector();
+        short[][] termFreq = index.getTermFreqMatrix();
+        short[][] keyFreq  = index.getKeywordFreqMatrix();
+        for (int i = 0; i < urls.length; i++) {
+            output.collect(new Text(urls[i]), new DocumentDescriptor(urls[i],
+                    termFreq[i], keyFreq[i]));
+        }
+        
+        writeNumDocs(urls.length);
+    }
+    
+    private void makeIndex(Iterator<ParsedDocument> values, Reporter reporter) {
+        index = new Index(reporter);
         
         ParsedDocument pDoc;
         String url;
-        HashMap<String, Long> termMap, keywordMap;
+        HashMap<String, Short> termMap, keywordMap;
         while (values.hasNext()) {
             pDoc = values.next();
             url = pDoc.getUrl().toString();
@@ -63,25 +88,6 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
         }
         
         index.filter(0.2, 0.8);
-        
-        String[] terms    = index.getTermVector();
-        String[] keywords = index.getKeywordVector();
-        
-        reporter.incrCounter(REDUCER_REPORT, "Term number", terms.length);
-        reporter.incrCounter(REDUCER_REPORT, "Keyword number", keywords.length);
-        
-        FeatureDescriptor fd = new FeatureDescriptor(terms, keywords);
-        output.collect(new Text("<<<FeatureDescriptor>>>"), fd);
-        
-        String[] urls     = index.getDocumentTermVector();
-        long[][] termFreq = index.getTermFreqMatrix();
-        long[][] keyFreq  = index.getKeywordFreqMatrix();
-        for (int i = 0; i < urls.length; i++) {
-            output.collect(new Text(urls[i]), new DocumentDescriptor(urls[i],
-                    termFreq[i], keyFreq[i]));
-        }
-        
-        writeNumDocs(urls.length);
     }
     
     private void writeNumDocs(int docs) throws IOException {

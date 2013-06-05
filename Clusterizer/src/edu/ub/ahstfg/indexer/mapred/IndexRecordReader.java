@@ -86,22 +86,21 @@ public class IndexRecordReader implements RecordReader<IntWritable, ArrayWritabl
                 return false;
             }
             String[] pair = Utils.trimStringArray(lineValue.toString().split("\t"));
-            if (pair.length != 2) {
-                throw new IOException("Invalid record received");
-            }
-            if (!pair[0].equals(FeatureDescriptor.KEY)) {
-                String[] keyTerms = pair[1].split(";");
-                String[] keywords = keyTerms[0].split(":");
-                String[] terms = keyTerms[1].split(":");
-                if (!keywords[0].equals("keywords") || !terms[0].equals("terms")) {
-                    throw new IOException("Invalid record received");
+            if (pair.length == 2) {
+                if (!pair[0].equals(FeatureDescriptor.KEY)) {
+                    String[] keyTerms = pair[1].split(";");
+                    String[] keywords = keyTerms[0].split(":");
+                    String[] terms = keyTerms[1].split(":");
+                    if (!keywords[0].equals("keywords") || !terms[0].equals("terms")) {
+                        continue;
+                    }
+                    outSet[i] = new DocumentDescriptor(pair[0],
+                            Utils.stringArray2ShortArray(Utils.trimStringArray(terms[1]
+                                    .split(","))), Utils.stringArray2ShortArray(Utils
+                                            .trimStringArray(keywords[1].split(","))));
+                } else {
+                    i--;
                 }
-                outSet[i] = new DocumentDescriptor(pair[0],
-                        Utils.stringArray2LongArray(Utils.trimStringArray(terms[1]
-                                .split(","))), Utils.stringArray2LongArray(Utils
-                                        .trimStringArray(keywords[1].split(","))));
-            } else {
-                i--;
             }
         }
         value.set(outSet);

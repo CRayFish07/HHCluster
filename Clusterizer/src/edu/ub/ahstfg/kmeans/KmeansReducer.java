@@ -45,8 +45,8 @@ Reducer<IntWritable, DocumentDistance, Text, IntWritable> {
         //boolean haveKeywords = nKeywords > 0;
         
         DocumentDistance d;
-        ArrayList<long[]> keys = new ArrayList<long[]>();
-        ArrayList<long[]> terms = new ArrayList<long[]>();
+        ArrayList<short[]> keys = new ArrayList<short[]>();
+        ArrayList<short[]> terms = new ArrayList<short[]>();
         DocumentDescriptor doc;
         boolean stub = false, allStub = false;
         int nStub = 0, count = 0;

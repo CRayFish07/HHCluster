@@ -5,9 +5,9 @@ import java.util.HashMap;
 import edu.ub.ahstfg.io.document.ParsedDocument;
 
 public class TestParsedDocument {
-
+    
     private ParsedDocument doc;
-
+    
     public TestParsedDocument() {
         doc = new ParsedDocument();
         doc.addTerm("hola");
@@ -21,12 +21,12 @@ public class TestParsedDocument {
         doc.addKeyword("hola");
         doc.addKeyword("palabra");
         doc.addKeyword("ola");
-        HashMap<String, Long> terms = doc.getTermMap();
-        HashMap<String, Long> keywords = doc.getKeywordMap();
+        HashMap<String, Short> terms = doc.getTermMap();
+        HashMap<String, Short> keywords = doc.getKeywordMap();
         System.out.println("Terms:");
         for (String term : terms.keySet()) {
             System.out
-                    .println("Term: " + term + " -> Freq: " + terms.get(term));
+            .println("Term: " + term + " -> Freq: " + terms.get(term));
         }
         System.out.println("Keywords:");
         for (String keyword : terms.keySet()) {
@@ -42,9 +42,9 @@ public class TestParsedDocument {
             System.out.println(l);
         }
     }
-
+    
     public static void main(String[] args) {
         new TestParsedDocument();
     }
-
+    
 }

@@ -36,10 +36,10 @@ public class Utils {
      * @param array String array to convert.
      * @return Converted long array.
      */
-    public static long[] stringArray2LongArray(String[] array) {
-        long[] ret = new long[array.length];
+    public static short[] stringArray2ShortArray(String[] array) {
+        short[] ret = new short[array.length];
         for (int i = 0; i < ret.length; i++) {
-            ret[i] = Long.parseLong(array[i]);
+            ret[i] = Short.parseShort(array[i]);
         }
         return ret;
     }
@@ -71,8 +71,8 @@ public class Utils {
      * @param max Maximum range limit.
      * @return A random integer in the specified range.
      */
-    public static int randomIntRange(int min, int max) {
-        return min + (int) (Math.random() * ((max - min) + 1));
+    public static short randomIntRange(int min, int max) {
+        return (short) (min + (Math.random() * ((max - min) + 1)));
     }
     
     /**

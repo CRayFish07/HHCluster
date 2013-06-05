@@ -5,7 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
@@ -16,8 +16,8 @@ import org.apache.hadoop.io.Writable;
  */
 public class ParsedDocument implements Writable {
     
-    private static final LongWritable ONE() {
-        return new LongWritable(1);
+    private static final IntWritable ONE() {
+        return new IntWritable(1);
     }
     
     private Text url;
@@ -56,7 +56,7 @@ public class ParsedDocument implements Writable {
      */
     public void addTerm(Text term) {
         if (terms.containsKey(term)) {
-            LongWritable n = (LongWritable) terms.get(term);
+            IntWritable n = (IntWritable) terms.get(term);
             n.set(n.get() + 1);
         } else {
             terms.put(term, ONE());
@@ -83,14 +83,14 @@ public class ParsedDocument implements Writable {
      * Gets the HashMap containing term frequency.
      * @return Term frequency HashMap.
      */
-    public HashMap<String, Long> getTermMap() {
-        HashMap<String, Long> ret = new HashMap<String, Long>();
+    public HashMap<String, Short> getTermMap() {
+        HashMap<String, Short> ret = new HashMap<String, Short>();
         Text t;
-        LongWritable value;
+        IntWritable value;
         for (Writable w : terms.keySet()) {
             t = (Text) w;
-            value = (LongWritable) terms.get(w);
-            ret.put(t.toString(), value.get());
+            value = (IntWritable) terms.get(w);
+            ret.put(t.toString(), (short)value.get());
         }
         return ret;
     }
@@ -118,11 +118,11 @@ public class ParsedDocument implements Writable {
     public long[] getTermFreqVector() {
         long[] ret = new long[terms.size()];
         Text t;
-        LongWritable v;
+        IntWritable v;
         int i = 0;
         for (Writable w : terms.keySet()) {
             t = (Text) w;
-            v = (LongWritable) terms.get(t);
+            v = (IntWritable) terms.get(t);
             ret[i] = v.get();
             i++;
         }
@@ -135,7 +135,7 @@ public class ParsedDocument implements Writable {
      */
     public void addKeyword(Text keyword) {
         if (keywords.containsKey(keyword)) {
-            LongWritable n = (LongWritable) keywords.get(keyword);
+            IntWritable n = (IntWritable) keywords.get(keyword);
             n.set(n.get() + 1);
         } else {
             keywords.put(keyword, ONE());
@@ -154,14 +154,14 @@ public class ParsedDocument implements Writable {
      * Gets the HashMap containing keyword frequency.
      * @return Keyword frequency HashMap.
      */
-    public HashMap<String, Long> getKeywordMap() {
-        HashMap<String, Long> ret = new HashMap<String, Long>();
+    public HashMap<String, Short> getKeywordMap() {
+        HashMap<String, Short> ret = new HashMap<String, Short>();
         Text t;
-        LongWritable value;
+        IntWritable value;
         for (Writable w : keywords.keySet()) {
             t = (Text) w;
-            value = (LongWritable) keywords.get(w);
-            ret.put(t.toString(), value.get());
+            value = (IntWritable) keywords.get(w);
+            ret.put(t.toString(), (short)value.get());
         }
         return ret;
     }
