@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.log4j.Logger;
 
 /**
  * Utilities.
@@ -11,10 +12,12 @@ import org.apache.hadoop.fs.FileSystem;
  */
 public class Utils {
     
+    private static final Logger LOG = Logger.getLogger(Utils.class);
+    
     /**
      * Default HDFS namenode host. Can be changed.
      */
-    public static String HDFS_HOST = "hdfs://localhost:9000/";//"hdfs://161.116.52.45:9000/";
+    public static String HDFS_HOST = "hdfs://161.116.52.45:9000/";
     
     /**
      * Trim all elements of a string array.
@@ -49,7 +52,7 @@ public class Utils {
      */
     public static FileSystem accessHDFS(String host) throws IOException {
         Configuration config = new Configuration();
-        config.set("fs.default.name", host);
+        //config.set("fs.default.name", host);
         return FileSystem.get(config);
     }
     
@@ -70,6 +73,15 @@ public class Utils {
      */
     public static int randomIntRange(int min, int max) {
         return min + (int) (Math.random() * ((max - min) + 1));
+    }
+    
+    /**
+     * Sets the namenode address.
+     * @param string
+     */
+    public static void setNamenodeAddress(String string) {
+        HDFS_HOST = string;
+        LOG.info("Namenode address setted to: " + HDFS_HOST);
     }
     
 }

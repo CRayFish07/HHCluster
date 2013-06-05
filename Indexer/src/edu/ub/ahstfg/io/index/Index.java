@@ -63,6 +63,12 @@ public class Index implements Writable {
                 l.add((long) 0);
             }
             termFreq.put(url, l);
+            
+            l = new ArrayList<Long>();
+            for (int i = 0; i < keywords.size(); i++) {
+                l.add((long) 0);
+            }
+            keywordFreq.put(url, l);
         }
         if (terms.contains(term)) {
             final int index = terms.indexOf(term);
@@ -189,7 +195,7 @@ public class Index implements Writable {
             final long freq) {
         if (!keywordFreq.containsKey(url)) {
             ArrayList<Long> l = new ArrayList<Long>();
-            for (int i = 0; i < terms.size(); i++) {
+            for (int i = 0; i < keywords.size(); i++) {
                 l.add((long) 0);
             }
             keywordFreq.put(url, l);
@@ -227,10 +233,10 @@ public class Index implements Writable {
      * @return An array of arrays with frequencies. Rows represents the documents.
      */
     public long[][] getKeywordFreqMatrix() {
-        long[][] ret = new long[termFreq.size()][terms.size()];
+        long[][] ret = new long[keywordFreq.size()][keywords.size()];
         int i = 0, j = 0;
         ArrayList<Long> freqs;
-        for (String url : termFreq.keySet()) {
+        for (String url : keywordFreq.keySet()) {
             freqs = keywordFreq.get(url);
             if (freqs != null) {
                 for (int k = 0; k < keywords.size(); k++) {

@@ -84,7 +84,7 @@ public class Indexer extends Configured implements Tool {
             LOG.error("Args: <Namenode adress>");
             System.exit(-1);
         }
-        Utils.HDFS_HOST = args[0];
+        Utils.setNamenodeAddress(args[0]);
         int res;
         try {
             res = ToolRunner.run(new Configuration(), new Indexer(), args);
