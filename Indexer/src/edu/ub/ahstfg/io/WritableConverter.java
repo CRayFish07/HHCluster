@@ -1,7 +1,7 @@
 package edu.ub.ahstfg.io;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.IntWritable;
@@ -19,12 +19,12 @@ import org.apache.hadoop.io.Writable;
 public class WritableConverter {
     
     /**
-     * Converts a long ArrayList to ArrayWritable.
-     * @param input Long ArrayList to convert.
+     * Converts a long LinkedList to ArrayWritable.
+     * @param input Long LinkedList to convert.
      * @return Converted ArrayWritable.
      */
-    public static ArrayWritable arrayListShort2ArrayWritable(
-            ArrayList<Short> input) {
+    public static ArrayWritable LinkedListShort2ArrayWritable(
+            LinkedList<Short> input) {
         ArrayWritable ret = new ArrayWritable(IntWritable.class);
         Writable[] ws = new Writable[input.size()];
         for (int i = 0; i < input.size(); i++) {
@@ -35,12 +35,12 @@ public class WritableConverter {
     }
     
     /**
-     * Converts String ArrayList to ArrayWritable.
-     * @param input String ArrayList to convert.
+     * Converts String LinkedList to ArrayWritable.
+     * @param input String LinkedList to convert.
      * @return Converted ArrayWritable.
      */
-    public static ArrayWritable arrayListString2ArrayWritable(
-            ArrayList<String> input) {
+    public static ArrayWritable LinkedListString2ArrayWritable(
+            LinkedList<String> input) {
         ArrayWritable ret = new ArrayWritable(Text.class);
         Writable[] ws = new Writable[input.size()];
         for (int i = 0; i < input.size(); i++) {
@@ -51,13 +51,13 @@ public class WritableConverter {
     }
     
     /**
-     * Converts long ArrayWritable to long ArrayList.
+     * Converts long ArrayWritable to long LinkedList.
      * @param input Long ArrayWritable to convert.
-     * @return Converted long ArrayList.
+     * @return Converted long LinkedList.
      */
-    public static ArrayList<Short> arrayWritable2ArrayListShort(
+    public static LinkedList<Short> arrayWritable2LinkedListShort(
             ArrayWritable input) {
-        ArrayList<Short> ret = new ArrayList<Short>();
+        LinkedList<Short> ret = new LinkedList<Short>();
         Writable[] ws = input.get();
         IntWritable l;
         for (Writable w : ws) {
@@ -68,13 +68,13 @@ public class WritableConverter {
     }
     
     /**
-     * Converts String ArrayWritable to String ArrayList.
+     * Converts String ArrayWritable to String LinkedList.
      * @param input String ArrayWritable to convert.
-     * @return Converted String ArrayList.
+     * @return Converted String LinkedList.
      */
-    public static ArrayList<String> arrayWritable2ArrayListString(
+    public static LinkedList<String> arrayWritable2LinkedListString(
             ArrayWritable input) {
-        ArrayList<String> ret = new ArrayList<String>();
+        LinkedList<String> ret = new LinkedList<String>();
         Writable[] ws = input.get();
         Text t;
         for (Writable w : ws) {
@@ -121,17 +121,17 @@ public class WritableConverter {
     }
     
     /**
-     * Converts a HashMap<String, ArrayList<Long>> to MapWritable.
+     * Converts a HashMap<String, LinkedList<Long>> to MapWritable.
      * @param input HasMap to convert.
      * @return Converted MapWritable.
      */
-    public static MapWritable hashMapStringArrayListShort2MapWritable(
-            HashMap<String, ArrayList<Short>> input) {
+    public static MapWritable hashMapStringLinkedListShort2MapWritable(
+            HashMap<String, LinkedList<Short>> input) {
         MapWritable ret = new MapWritable();
-        ArrayList<Short> arl;
+        LinkedList<Short> arl;
         for (String s : input.keySet()) {
             arl = input.get(s);
-            ret.put(new Text(s), arrayListShort2ArrayWritable(arl));
+            ret.put(new Text(s), LinkedListShort2ArrayWritable(arl));
         }
         return ret;
     }
@@ -154,20 +154,20 @@ public class WritableConverter {
     }
     
     /**
-     * Converts MapWritable to HashMap<String, ArrayList<Long>>.
+     * Converts MapWritable to HashMap<String, LinkedList<Long>>.
      * @param input MapWritable to convert.
      * @return Converted HashMap.
      */
-    public static HashMap<String, ArrayList<Short>> mapWritable2HashMapStringArrayListShort(
+    public static HashMap<String, LinkedList<Short>> mapWritable2HashMapStringLinkedListShort(
             MapWritable input) {
-        HashMap<String, ArrayList<Short>> ret = new HashMap<String, ArrayList<Short>>();
+        HashMap<String, LinkedList<Short>> ret = new HashMap<String, LinkedList<Short>>();
         Text t;
         ArrayWritable aw;
-        ArrayList<Short> al;
+        LinkedList<Short> al;
         for (Writable w : input.keySet()) {
             t = (Text) w;
             aw = (ArrayWritable) input.get(t);
-            al = arrayWritable2ArrayListShort(aw);
+            al = arrayWritable2LinkedListShort(aw);
             ret.put(t.toString(), al);
         }
         return ret;

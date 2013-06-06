@@ -53,7 +53,7 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
         FeatureDescriptor fd = new FeatureDescriptor(terms, keywords);
         output.collect(new Text("<<<FeatureDescriptor>>>"), fd);
         
-        String[] urls     = index.getDocumentTermVector();
+        String[] urls      = index.getDocumentTermVector();
         short[][] termFreq = index.getTermFreqMatrix();
         short[][] keyFreq  = index.getKeywordFreqMatrix();
         for (int i = 0; i < urls.length; i++) {

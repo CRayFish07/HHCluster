@@ -3,8 +3,8 @@ package edu.ub.ahstfg.io.index;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.MapWritable;
@@ -20,13 +20,13 @@ import edu.ub.ahstfg.io.WritableConverter;
  */
 public class Index implements Writable {
     
-    private ArrayList<String> terms;
-    private HashMap<String, ArrayList<Short>> termFreq;
+    private LinkedList<String> terms;
+    private HashMap<String, LinkedList<Short>> termFreq;
     
-    private HashMap<String, ArrayList<String>> termAppearance;
+    private HashMap<String, LinkedList<String>> termAppearance;
     
-    private ArrayList<String> keywords;
-    private HashMap<String, ArrayList<Short>> keywordFreq;
+    private LinkedList<String> keywords;
+    private HashMap<String, LinkedList<Short>> keywordFreq;
     
     private Reporter reporter;
     
@@ -35,13 +35,13 @@ public class Index implements Writable {
      * @param reporter Hadoop job reporter.
      */
     public Index(Reporter reporter) {
-        terms = new ArrayList<String>();
-        termFreq = new HashMap<String, ArrayList<Short>>();
+        terms = new LinkedList<String>();
+        termFreq = new HashMap<String, LinkedList<Short>>();
         
-        termAppearance = new HashMap<String, ArrayList<String>>();
+        termAppearance = new HashMap<String, LinkedList<String>>();
         
-        keywords = new ArrayList<String>();
-        keywordFreq = new HashMap<String, ArrayList<Short>>();
+        keywords = new LinkedList<String>();
+        keywordFreq = new HashMap<String, LinkedList<Short>>();
         
         this.reporter = reporter;
         reporter.incrCounter("Index report", "Remove term request", 0);
@@ -58,13 +58,13 @@ public class Index implements Writable {
     public void addTerm(final String term, final String url, final short freq) {
         addTermAppearance(url, term);
         if (!termFreq.containsKey(url)) {
-            ArrayList<Short> l = new ArrayList<Short>();
+            LinkedList<Short> l = new LinkedList<Short>();
             for (int i = 0; i < terms.size(); i++) {
                 l.add((short)0);
             }
             termFreq.put(url, l);
             
-            l = new ArrayList<Short>();
+            l = new LinkedList<Short>();
             for (int i = 0; i < keywords.size(); i++) {
                 l.add((short)0);
             }
@@ -72,12 +72,12 @@ public class Index implements Writable {
         }
         if (terms.contains(term)) {
             final int index = terms.indexOf(term);
-            ArrayList<Short> freqs = termFreq.get(url);
+            LinkedList<Short> freqs = termFreq.get(url);
             freqs.set(index, (short)(freqs.get(index) + freq));
         } else {
             terms.add(term);
             final int index = terms.indexOf(term);
-            ArrayList<Short> freqs;
+            LinkedList<Short> freqs;
             for (String storedUrl : termFreq.keySet()) {
                 freqs = termFreq.get(storedUrl);
                 if (storedUrl.equals(url)) {
@@ -97,9 +97,9 @@ public class Index implements Writable {
      */
     private void addTermAppearance(final String url, final String term) {
         if (!termAppearance.containsKey(term)) {
-            termAppearance.put(term, new ArrayList<String>());
+            termAppearance.put(term, new LinkedList<String>());
         }
-        ArrayList<String> docs = termAppearance.get(term);
+        LinkedList<String> docs = termAppearance.get(term);
         if (!docs.contains(url)) {
             docs.add(url);
         }
@@ -134,7 +134,7 @@ public class Index implements Writable {
     public short[][] getTermFreqMatrix() {
         short[][] ret = new short[termFreq.size()][terms.size()];
         int i = 0, j = 0;
-        ArrayList<Short> freqs;
+        LinkedList<Short> freqs;
         for (String url : termFreq.keySet()) {
             freqs = termFreq.get(url);
             for (int k = 0; k < terms.size(); k++) {
@@ -155,7 +155,7 @@ public class Index implements Writable {
         int idx = terms.indexOf(term);
         if(idx > 0) {
             terms.remove(idx);
-            ArrayList<Short> tf;
+            LinkedList<Short> tf;
             for (String url : termFreq.keySet()) {
                 tf = termFreq.get(url);
                 tf.remove(idx);
@@ -194,7 +194,7 @@ public class Index implements Writable {
     public void addKeyword(final String keyword, final String url,
             final Short freq) {
         if (!keywordFreq.containsKey(url)) {
-            ArrayList<Short> l = new ArrayList<Short>();
+            LinkedList<Short> l = new LinkedList<Short>();
             for (int i = 0; i < keywords.size(); i++) {
                 l.add((short)0);
             }
@@ -202,12 +202,12 @@ public class Index implements Writable {
         }
         if (keywords.contains(keyword)) {
             final int index = keywords.indexOf(keyword);
-            ArrayList<Short> freqs = keywordFreq.get(url);
+            LinkedList<Short> freqs = keywordFreq.get(url);
             freqs.set(index, (short)(freqs.get(index) + freq));
         } else {
             keywords.add(keyword);
             final int index = keywords.indexOf(keyword);
-            ArrayList<Short> freqs;
+            LinkedList<Short> freqs;
             for (String storedUrl : keywordFreq.keySet()) {
                 freqs = keywordFreq.get(storedUrl);
                 if (storedUrl.equals(url)) {
@@ -235,7 +235,7 @@ public class Index implements Writable {
     public short[][] getKeywordFreqMatrix() {
         short[][] ret = new short[keywordFreq.size()][keywords.size()];
         int i = 0, j = 0;
-        ArrayList<Short> freqs;
+        LinkedList<Short> freqs;
         for (String url : keywordFreq.keySet()) {
             freqs = keywordFreq.get(url);
             if (freqs != null) {
@@ -256,30 +256,30 @@ public class Index implements Writable {
     public void readFields(DataInput input) throws IOException {
         ArrayWritable wTerms = new ArrayWritable(Text.class);
         wTerms.readFields(input);
-        terms = WritableConverter.arrayWritable2ArrayListString(wTerms);
+        terms = WritableConverter.arrayWritable2LinkedListString(wTerms);
         
         MapWritable wTermFreq = new MapWritable();
         wTermFreq.readFields(input);
         termFreq = WritableConverter
-                .mapWritable2HashMapStringArrayListShort(wTermFreq);
+                .mapWritable2HashMapStringLinkedListShort(wTermFreq);
         
         ArrayWritable wKeywords = new ArrayWritable(Text.class);
         wKeywords.readFields(input);
-        keywords = WritableConverter.arrayWritable2ArrayListString(wKeywords);
+        keywords = WritableConverter.arrayWritable2LinkedListString(wKeywords);
         
         MapWritable wKeywordFreq = new MapWritable();
         wKeywordFreq.readFields(input);
         keywordFreq = WritableConverter
-                .mapWritable2HashMapStringArrayListShort(wKeywordFreq);
+                .mapWritable2HashMapStringLinkedListShort(wKeywordFreq);
     }
     
     @Override
     public void write(DataOutput output) throws IOException {
-        WritableConverter.arrayListString2ArrayWritable(terms).write(output);
-        WritableConverter.hashMapStringArrayListShort2MapWritable(termFreq)
+        WritableConverter.LinkedListString2ArrayWritable(terms).write(output);
+        WritableConverter.hashMapStringLinkedListShort2MapWritable(termFreq)
         .write(output);
-        WritableConverter.arrayListString2ArrayWritable(keywords).write(output);
-        WritableConverter.hashMapStringArrayListShort2MapWritable(keywordFreq)
+        WritableConverter.LinkedListString2ArrayWritable(keywords).write(output);
+        WritableConverter.hashMapStringLinkedListShort2MapWritable(keywordFreq)
         .write(output);
     }
     
