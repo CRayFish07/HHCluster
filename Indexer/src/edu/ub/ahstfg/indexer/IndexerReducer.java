@@ -1,8 +1,8 @@
 package edu.ub.ahstfg.indexer;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -14,10 +14,9 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 
 import edu.ub.ahstfg.io.document.ParsedDocument;
-import edu.ub.ahstfg.io.index.DocumentDescriptor;
 import edu.ub.ahstfg.io.index.FeatureDescriptor;
-import edu.ub.ahstfg.io.index.Index;
 import edu.ub.ahstfg.io.index.IndexRecord;
+import edu.ub.ahstfg.io.index.NewIndex;
 import edu.ub.ahstfg.utils.Utils;
 
 /**
@@ -31,7 +30,7 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
     
     public static final String REDUCER_REPORT = "Reducer report";
     
-    private Index index;
+    private NewIndex index;
     
     @Override
     public void reduce(Text key, Iterator<ParsedDocument> values,
@@ -44,47 +43,28 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
         
         makeIndex(values, reporter);
         
-        String[] terms    = index.getTermVector();
-        String[] keywords = index.getKeywordVector();
+        reporter.incrCounter(REDUCER_REPORT, "Document number", index.getNumDocs());
+        reporter.incrCounter(REDUCER_REPORT, "Term number", index.getNumTerms());
+        reporter.incrCounter(REDUCER_REPORT, "Keyword number", index.getNumKeywords());
         
-        reporter.incrCounter(REDUCER_REPORT, "Term number", terms.length);
-        reporter.incrCounter(REDUCER_REPORT, "Keyword number", keywords.length);
-        
-        FeatureDescriptor fd = new FeatureDescriptor(terms, keywords);
+        FeatureDescriptor fd = index.getFeatures();
         output.collect(new Text("<<<FeatureDescriptor>>>"), fd);
         
-        String[] urls      = index.getDocumentTermVector();
-        short[][] termFreq = index.getTermFreqMatrix();
-        short[][] keyFreq  = index.getKeywordFreqMatrix();
-        for (int i = 0; i < urls.length; i++) {
-            output.collect(new Text(urls[i]), new DocumentDescriptor(urls[i],
-                    termFreq[i], keyFreq[i]));
+        Set<String> urls = index.getDocs();
+        for(String url: urls) {
+            output.collect(new Text(url), index.getFullDocument(url));
         }
         
-        writeNumDocs(urls.length);
+        writeNumDocs(index.getNumDocs());
     }
     
     private void makeIndex(Iterator<ParsedDocument> values, Reporter reporter) {
-        index = new Index(reporter);
+        index = new NewIndex();
         
         ParsedDocument pDoc;
-        String url;
-        HashMap<String, Short> termMap, keywordMap;
         while (values.hasNext()) {
             pDoc = values.next();
-            url = pDoc.getUrl().toString();
-            termMap = pDoc.getTermMap();
-            if (termMap != null) {
-                for (String term : termMap.keySet()) {
-                    index.addTerm(term, url, termMap.get(term));
-                }
-            }
-            keywordMap = pDoc.getKeywordMap();
-            if (keywordMap != null) {
-                for (String keyword : keywordMap.keySet()) {
-                    index.addKeyword(keyword, url, keywordMap.get(keyword));
-                }
-            }
+            index.addDocument(pDoc);
         }
         
         index.filter(0.2, 0.8);
@@ -92,8 +72,7 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
     
     private void writeNumDocs(int docs) throws IOException {
         FileSystem fs = Utils.accessHDFS();
-        FSDataOutputStream out = fs.create(new Path(
-                FeatureDescriptor.NUM_DOCS_PATH));
+        FSDataOutputStream out = fs.create(new Path(FeatureDescriptor.NUM_DOCS_PATH));
         out.writeInt(docs);
         out.close();
     }

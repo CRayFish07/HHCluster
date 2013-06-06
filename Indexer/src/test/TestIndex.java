@@ -1,6 +1,9 @@
 package test;
 
-import edu.ub.ahstfg.io.index.Index;
+import edu.ub.ahstfg.io.document.ParsedDocument;
+import edu.ub.ahstfg.io.index.DocumentDescriptor;
+import edu.ub.ahstfg.io.index.FeatureDescriptor;
+import edu.ub.ahstfg.io.index.NewIndex;
 
 public class TestIndex {
     
@@ -8,41 +11,48 @@ public class TestIndex {
     private static final String url2 = "http://google.es";
     private static final String url3 = "http://ub.edu";
     
-    private Index index;
+    private NewIndex index;
     
     public TestIndex() {
-        index = new Index(null);
-        index.addTerm("hola", url1, (short)3);
-        index.addTerm("prueba", url1, (short)1);
-        index.addTerm("documento", url1, (short)1);
-        index.addTerm("test", url1, (short)8);
+        index = new NewIndex();
         
-        index.addTerm("hola", url2, (short)5);
-        index.addTerm("caracola", url2, (short)3);
-        index.addTerm("que", url2, (short)3);
-        index.addTerm("haces", url2, (short)3);
+        ParsedDocument p1 = new ParsedDocument(url1);
+        p1.addTerm("hola");
+        p1.addTerm("buenos");
+        p1.addTerm("dias");
+        p1.addTerm("senor");
+        p1.addKeyword("k1");
+        p1.addKeyword("k2");
+        p1.addKeyword("k3");
+        p1.addKeyword("k4");
         
-        index.addTerm("hola", url3, (short)1);
-        index.addTerm("que", url3, (short)2);
-        index.addTerm("prueba", url3, (short)3);
-        index.addTerm("test", url3, (short)4);
+        ParsedDocument p2 = new ParsedDocument(url2);
+        p2.addTerm("que");
+        p2.addTerm("cuenta");
+        p2.addTerm("buenos");
+        p2.addKeyword("k2");
+        p2.addKeyword("k5");
         
-        String[] termVector = index.getTermVector();
-        for (String s : termVector) {
-            System.out.print(s + " | ");
-        }
-        System.out.println("");
+        ParsedDocument p3 = new ParsedDocument(url3);
+        p3.addTerm("hola");
+        p3.addTerm("hola");
+        p3.addTerm("hola");
+        p3.addTerm("kk");
         
-        String[] docVector = index.getDocumentTermVector();
+        index.addDocument(p1);
+        index.addDocument(p2);
+        index.addDocument(p3);
         
-        short[][] freqMatrix = index.getTermFreqMatrix();
-        for (int i = 0; i < docVector.length; i++) {
-            System.out.print(docVector[i] + ": ");
-            for (int j = 0; j < termVector.length; j++) {
-                System.out.print(freqMatrix[i][j] + ", ");
-            }
-            System.out.println("");
-        }
+        index.filter((double)0.0, (double)1.0);
+        
+        System.out.println(index.getNumDocs());
+        System.out.println(index.getNumTerms());
+        System.out.println(index.getNumKeywords());
+        
+        FeatureDescriptor fd = index.getFeatures();
+        DocumentDescriptor dd1 = index.getFullDocument(url1);
+        DocumentDescriptor dd2 = index.getFullDocument(url2);
+        DocumentDescriptor dd3 = index.getFullDocument(url3);
     }
     
     public static void main(String[] args) {
