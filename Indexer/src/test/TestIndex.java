@@ -3,7 +3,7 @@ package test;
 import edu.ub.ahstfg.io.document.ParsedDocument;
 import edu.ub.ahstfg.io.index.DocumentDescriptor;
 import edu.ub.ahstfg.io.index.FeatureDescriptor;
-import edu.ub.ahstfg.io.index.NewIndex;
+import edu.ub.ahstfg.io.index.Index;
 
 public class TestIndex {
     
@@ -11,10 +11,10 @@ public class TestIndex {
     private static final String url2 = "http://google.es";
     private static final String url3 = "http://ub.edu";
     
-    private NewIndex index;
+    private Index index;
     
     public TestIndex() {
-        index = new NewIndex();
+        index = new Index();
         
         ParsedDocument p1 = new ParsedDocument(url1);
         p1.addTerm("hola");

@@ -9,10 +9,10 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.RecordWriter;
 import org.apache.hadoop.mapred.Reporter;
 
-import edu.ub.ahstfg.io.index.Index;
+import edu.ub.ahstfg.io.index.ArrayIndex;
 
 @Deprecated
-public class IndexWriter implements RecordWriter<Text, Index> {
+public class IndexWriter implements RecordWriter<Text, ArrayIndex> {
     
     private DataOutputStream out;
     
@@ -31,7 +31,7 @@ public class IndexWriter implements RecordWriter<Text, Index> {
     }
     
     @Override
-    public void write(Text key, Index value) throws IOException {
+    public void write(Text key, ArrayIndex value) throws IOException {
         boolean nullKey = key == null || (Writable) key instanceof NullWritable;
         boolean nullValue = value == null
                 || (Writable) value instanceof NullWritable;
@@ -46,7 +46,7 @@ public class IndexWriter implements RecordWriter<Text, Index> {
         
     }
     
-    private void writeIndex(Index index) throws IOException {
+    private void writeIndex(ArrayIndex index) throws IOException {
         final String[] terms = index.getTermVector();
         final String[] keywords = index.getKeywordVector();
         final String[] urls = index.getDocumentTermVector();

@@ -1,286 +1,233 @@
 package edu.ub.ahstfg.io.index;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
 
-import org.apache.hadoop.io.ArrayWritable;
-import org.apache.hadoop.io.MapWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.Reporter;
-
-import edu.ub.ahstfg.io.WritableConverter;
+import edu.ub.ahstfg.io.document.ParsedDocument;
 
 /**
  * Index class. Groups all terms and keywords and constructs the feature matrix.
+ * Basic structure is conformed using HashMaps, due to its quick access and no
+ * extra cost of memory at the add operation.
  * @author Alberto Huelamo Segura
  */
-public class Index implements Writable {
+public class Index {
     
-    private LinkedList<String> terms;
-    private HashMap<String, LinkedList<Short>> termFreq;
+    private static final int ZERO = 0;
+    private static final boolean TERM_COUNTER = false;
+    private static final boolean KEYWORD_COUNTER = true;
     
-    private HashMap<String, LinkedList<String>> termAppearance;
+    private HashMap<String, Integer> documents;
+    private int docCounter;
     
-    private LinkedList<String> keywords;
-    private HashMap<String, LinkedList<Short>> keywordFreq;
+    private HashMap<String, Integer> terms;
+    private HashMap<Integer, HashMap<Integer, Short>> termFreq;
+    private int termCounter;
+    private String[] termVector;
     
-    private Reporter reporter;
+    private HashMap<String, Integer> keywords;
+    private HashMap<Integer, HashMap<Integer, Short>> keywordFreq;
+    private int keywordCounter;
+    private String[] keywordVector;
     
     /**
      * Sole constructor.
-     * @param reporter Hadoop job reporter.
      */
-    public Index(Reporter reporter) {
-        terms = new LinkedList<String>();
-        termFreq = new HashMap<String, LinkedList<Short>>();
+    public Index() {
+        documents = new HashMap<String, Integer>();
+        docCounter = 0;
         
-        termAppearance = new HashMap<String, LinkedList<String>>();
+        terms = new HashMap<String, Integer>();
+        termFreq = new HashMap<Integer, HashMap<Integer, Short>>();
+        termCounter = 0;
         
-        keywords = new LinkedList<String>();
-        keywordFreq = new HashMap<String, LinkedList<Short>>();
-        
-        this.reporter = reporter;
-        reporter.incrCounter("Index report", "Remove term request", 0);
-        reporter.incrCounter("Index report", "Removed terms", 0);
+        keywords = new HashMap<String, Integer>();
+        keywordFreq = new HashMap<Integer, HashMap<Integer, Short>>();
+        keywordCounter = 0;
     }
     
     /**
-     * Adds a term from a document to the index.
-     * If the term already exists increases their frequency.
-     * @param term Term to add.
-     * @param url Document where term appears.
-     * @param freq Frequency to increase.
+     * Adds a document to the matrices.
+     * @param doc
      */
-    public void addTerm(final String term, final String url, final short freq) {
-        addTermAppearance(url, term);
-        if (!termFreq.containsKey(url)) {
-            LinkedList<Short> l = new LinkedList<Short>();
-            for (int i = 0; i < terms.size(); i++) {
-                l.add((short)0);
-            }
-            termFreq.put(url, l);
-            
-            l = new LinkedList<Short>();
-            for (int i = 0; i < keywords.size(); i++) {
-                l.add((short)0);
-            }
-            keywordFreq.put(url, l);
+    public void addDocument(ParsedDocument doc) {
+        String url = doc.getUrl().toString();
+        if (!documents.containsKey(url)) {
+            documents.put(url, docCounter);
+            docCounter++;
         }
-        if (terms.contains(term)) {
-            final int index = terms.indexOf(term);
-            LinkedList<Short> freqs = termFreq.get(url);
-            freqs.set(index, (short)(freqs.get(index) + freq));
+        int docID = documents.get(url);
+        addItems(docID, doc.getTermMap(), terms, termFreq, TERM_COUNTER);
+        addItems(docID, doc.getKeywordMap(), keywords, keywordFreq, KEYWORD_COUNTER);
+    }
+    
+    private void addItems(int docID, HashMap<String, Short> docItemMap,
+            HashMap<String, Integer> items,
+            HashMap<Integer, HashMap<Integer, Short>> itemFreq,
+            boolean itemCounter) {
+        Set<String> docItems = docItemMap.keySet();
+        int itemID;
+        short freq;
+        HashMap<Integer, Short> itemMap;
+        for (String item : docItems) {
+            freq = docItemMap.get(item);
+            if (!items.containsKey(item)) {
+                items.put(item, getItemCounter(itemCounter));
+                itemFreq.put(getItemCounter(itemCounter), new HashMap<Integer, Short>());
+                incrementItemCounter(itemCounter);
+            }
+            itemID = items.get(item);
+            itemMap = itemFreq.get(itemID);
+            itemMap.put(docID, freq);
+        }
+    }
+    
+    private int getItemCounter(boolean type) {
+        if(type == TERM_COUNTER) {
+            return termCounter;
         } else {
-            terms.add(term);
-            final int index = terms.indexOf(term);
-            LinkedList<Short> freqs;
-            for (String storedUrl : termFreq.keySet()) {
-                freqs = termFreq.get(storedUrl);
-                if (storedUrl.equals(url)) {
-                    freqs.add((short)0);
-                    freqs.set(index, freq);
-                } else {
-                    freqs.add((short)0);
-                }
-            }
+            return keywordCounter;
+        }
+    }
+    
+    private void incrementItemCounter(boolean type) {
+        if(type == TERM_COUNTER) {
+            termCounter++;
+        } else {
+            keywordCounter++;
         }
     }
     
     /**
-     * Adds a document to term appearace. Used to filter.
-     * @param url Docuemnt URL to add.
-     * @param term Term which appears in document.
+     * Reduces the number of features of the index. Removes those terms which
+     * appears in less documents than a percentage and those which appears in
+     * more documents than other percentage.
+     * @param min Minimum appearance percentage.
+     * @param max Maximum appearance percentage.
+     * @throws IllegalArgumentException Thrown if min < 0 or mix > 1 or max < 0
+     * or max > 1 or min >= max.
      */
-    private void addTermAppearance(final String url, final String term) {
-        if (!termAppearance.containsKey(term)) {
-            termAppearance.put(term, new LinkedList<String>());
+    public void filter(double min, double max) throws IllegalArgumentException {
+        if (min < 0 || min > 1 || max < 0 || max > 1 || min >= max) {
+            throw new IllegalArgumentException("Min or max limits are incorrect.");
         }
-        LinkedList<String> docs = termAppearance.get(term);
-        if (!docs.contains(url)) {
-            docs.add(url);
-        }
-    }
-    
-    /**
-     * Gets the term vector.
-     * @return An array of terms.
-     */
-    public String[] getTermVector() {
-        return terms.toArray(new String[terms.size()]);
-    }
-    
-    /**
-     * Gets the document urls which have terms.
-     * @return An array of urls.
-     */
-    public String[] getDocumentTermVector() {
-        String[] ret = new String[termFreq.size()];
-        int i = 0;
-        for (String url : termFreq.keySet()) {
-            ret[i] = url;
-            i++;
-        }
-        return ret;
-    }
-    
-    /**
-     * Gets the term frequency matrix.
-     * @return An array of arrays with frequencies. Rows represents the documents.
-     */
-    public short[][] getTermFreqMatrix() {
-        short[][] ret = new short[termFreq.size()][terms.size()];
-        int i = 0, j = 0;
-        LinkedList<Short> freqs;
-        for (String url : termFreq.keySet()) {
-            freqs = termFreq.get(url);
-            for (int k = 0; k < terms.size(); k++) {
-                ret[i][j] = freqs.get(j);
-                j++;
-            }
-            i++;
-            j = 0;
-        }
-        return ret;
-    }
-    
-    /**
-     * Removes a term from all documents.
-     * @param term The term to remove.
-     */
-    public void removeTerm(String term) {
-        int idx = terms.indexOf(term);
-        if(idx > 0) {
-            terms.remove(idx);
-            LinkedList<Short> tf;
-            for (String url : termFreq.keySet()) {
-                tf = termFreq.get(url);
-                tf.remove(idx);
-            }
-            reporter.incrCounter("Index report", "Removed terms", 1);
-        }
-    }
-    
-    /**
-     * Filters the index. Removes those terms which appears in less documents
-     * than a percentage and those which appears in more documents than other
-     * percentage.
-     * @param infCote Terms which appear in less documents than this percentage will be removed.
-     * @param supCote Terms which appear in more documents than this percentage will be removed.
-     */
-    public void filter(double infCote, double supCote) {
-        int nDocs, totalDocs = termFreq.size();
+        int termID, tDocs, nDocs = documents.size();
         double rate;
-        for (String term : termAppearance.keySet()) {
-            nDocs = termAppearance.get(term).size();
-            rate = (double) nDocs / (double) totalDocs;
-            if (rate < infCote || rate > supCote) {
-                removeTerm(term);
-                reporter.incrCounter("Index report", "Remove term request", 1);
+        LinkedList<String> toRemove = new LinkedList<String>();
+        for (String term : terms.keySet()) {
+            termID = terms.get(term);
+            tDocs = termFreq.get(termID).size();
+            rate = (double) tDocs / (double) nDocs;
+            if (rate < min || rate > max) {
+                toRemove.add(term);
             }
         }
+        for(String termToRemove: toRemove) {
+            termFreq.remove(terms.get(termToRemove));
+            terms.remove(termToRemove);
+        }
+        toRemove = null;
     }
     
     /**
-     * Adds a keyword from a document to the index.
-     * If the keyword already exists increases their frequency.
-     * @param keyword Keyword to add.
-     * @param url Document where keyword appears.
-     * @param freq Frequency to increase.
+     * Gets the FeatureDescriptor of the index.
+     * @return The FeatureDescriptor.
      */
-    public void addKeyword(final String keyword, final String url,
-            final Short freq) {
-        if (!keywordFreq.containsKey(url)) {
-            LinkedList<Short> l = new LinkedList<Short>();
-            for (int i = 0; i < keywords.size(); i++) {
-                l.add((short)0);
-            }
-            keywordFreq.put(url, l);
-        }
-        if (keywords.contains(keyword)) {
-            final int index = keywords.indexOf(keyword);
-            LinkedList<Short> freqs = keywordFreq.get(url);
-            freqs.set(index, (short)(freqs.get(index) + freq));
-        } else {
-            keywords.add(keyword);
-            final int index = keywords.indexOf(keyword);
-            LinkedList<Short> freqs;
-            for (String storedUrl : keywordFreq.keySet()) {
-                freqs = keywordFreq.get(storedUrl);
-                if (storedUrl.equals(url)) {
-                    freqs.add((short)0);
-                    freqs.set(index, freq);
-                } else {
-                    freqs.add((short)0);
-                }
-            }
-        }
+    public FeatureDescriptor getFeatures() {
+        termVector = new String[terms.size()];
+        keywordVector = new String[keywords.size()];
+        
+        terms.keySet().toArray(termVector);
+        keywords.keySet().toArray(keywordVector);
+        
+        return new FeatureDescriptor(termVector, keywordVector);
     }
     
     /**
-     * Gets the vector of the added keywords.
-     * @return An array with the keywords.
+     * Gets the DocumentDescriptor from an URL.
+     * @param url The document URL.
+     * @return The DocumentDescriptor.
      */
-    public String[] getKeywordVector() {
-        return keywords.toArray(new String[keywords.size()]);
+    public DocumentDescriptor getFullDocument(String url) {
+        if (!documents.containsKey(url)) {
+            return null;
+        }
+        int docID = documents.get(url);
+        short[] termVector = new short[terms.size()];
+        short[] keywordVector = new short[keywords.size()];
+        
+        makeFreqVector(docID, termVector, terms, termFreq, this.termVector);
+        makeFreqVector(docID, keywordVector, keywords, keywordFreq, this.keywordVector);
+        
+        return new DocumentDescriptor(url, termVector, keywordVector);
     }
     
-    /**
-     * Gets the keyword frequency matrix.
-     * @return An array of arrays with frequencies. Rows represents the documents.
-     */
-    public short[][] getKeywordFreqMatrix() {
-        short[][] ret = new short[keywordFreq.size()][keywords.size()];
-        int i = 0, j = 0;
-        LinkedList<Short> freqs;
-        for (String url : keywordFreq.keySet()) {
-            freqs = keywordFreq.get(url);
-            if (freqs != null) {
-                for (int k = 0; k < keywords.size(); k++) {
-                    ret[i][j] = freqs.get(j);
-                    j++;
-                }
+    private static void makeFreqVector(int docID, short[] vector,
+            HashMap<String, Integer> items,
+            HashMap<Integer, HashMap<Integer, Short>> itemFreq,
+            String[] itemVector) {
+        int itemID;
+        HashMap<Integer, Short> itemMap;
+        String item;
+        for(int i = 0; i < itemVector.length; i++) {
+            item = itemVector[i];
+            itemID = items.get(item);
+            itemMap = itemFreq.get(itemID);
+            if(itemMap.containsKey(docID)) {
+                vector[i] = itemMap.get(docID);
             } else {
-                ret[i] = new short[] { (short)-1 };
+                vector[i] = ZERO;
             }
-            i++;
-            j = 0;
         }
-        return ret;
     }
     
-    @Override
-    public void readFields(DataInput input) throws IOException {
-        ArrayWritable wTerms = new ArrayWritable(Text.class);
-        wTerms.readFields(input);
-        terms = WritableConverter.arrayWritable2LinkedListString(wTerms);
-        
-        MapWritable wTermFreq = new MapWritable();
-        wTermFreq.readFields(input);
-        termFreq = WritableConverter
-                .mapWritable2HashMapStringLinkedListShort(wTermFreq);
-        
-        ArrayWritable wKeywords = new ArrayWritable(Text.class);
-        wKeywords.readFields(input);
-        keywords = WritableConverter.arrayWritable2LinkedListString(wKeywords);
-        
-        MapWritable wKeywordFreq = new MapWritable();
-        wKeywordFreq.readFields(input);
-        keywordFreq = WritableConverter
-                .mapWritable2HashMapStringLinkedListShort(wKeywordFreq);
+    /**
+     * Gets the document URL set.
+     * @return The document URL set.
+     */
+    public Set<String> getDocs() {
+        return documents.keySet();
     }
     
-    @Override
-    public void write(DataOutput output) throws IOException {
-        WritableConverter.LinkedListString2ArrayWritable(terms).write(output);
-        WritableConverter.hashMapStringLinkedListShort2MapWritable(termFreq)
-        .write(output);
-        WritableConverter.LinkedListString2ArrayWritable(keywords).write(output);
-        WritableConverter.hashMapStringLinkedListShort2MapWritable(keywordFreq)
-        .write(output);
+    /**
+     * Gets the number of documents.
+     * @return The number of documents.
+     */
+    public int getNumDocs() {
+        return documents.size();
+    }
+    
+    /**
+     * Gets the term set.
+     * @return The term set.
+     */
+    public Set<String> getTerms() {
+        return terms.keySet();
+    }
+    
+    /**
+     * Gets the number of terms.
+     * @return The number of terms.
+     */
+    public int getNumTerms() {
+        return terms.size();
+    }
+    
+    /**
+     * Gets the keywords set.
+     * @return The keywords set.
+     */
+    public Set<String> getKeywords() {
+        return keywords.keySet();
+    }
+    
+    /**
+     * Gets the number of keywords.
+     * @return The number of keywords.
+     */
+    public int getNumKeywords() {
+        return keywords.size();
     }
     
 }

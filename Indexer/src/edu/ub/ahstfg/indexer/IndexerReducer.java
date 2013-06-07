@@ -16,7 +16,7 @@ import org.apache.hadoop.mapred.Reporter;
 import edu.ub.ahstfg.io.document.ParsedDocument;
 import edu.ub.ahstfg.io.index.FeatureDescriptor;
 import edu.ub.ahstfg.io.index.IndexRecord;
-import edu.ub.ahstfg.io.index.NewIndex;
+import edu.ub.ahstfg.io.index.Index;
 import edu.ub.ahstfg.utils.Utils;
 
 /**
@@ -30,7 +30,7 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
     
     public static final String REDUCER_REPORT = "Reducer report";
     
-    private NewIndex index;
+    private Index index;
     
     @Override
     public void reduce(Text key, Iterator<ParsedDocument> values,
@@ -59,7 +59,7 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
     }
     
     private void makeIndex(Iterator<ParsedDocument> values, Reporter reporter) {
-        index = new NewIndex();
+        index = new Index();
         
         ParsedDocument pDoc;
         while (values.hasNext()) {
