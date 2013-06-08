@@ -6,7 +6,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.hadoop.io.ArrayWritable;
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 
 import edu.ub.ahstfg.io.WritableConverter;
@@ -79,10 +79,10 @@ public class DocumentDescriptor implements IndexRecord {
         Text t = new Text();
         t.readFields(input);
         url = t.toString();
-        ArrayWritable buffer = new ArrayWritable(LongWritable.class);
+        ArrayWritable buffer = new ArrayWritable(IntWritable.class);
         buffer.readFields(input);
         termFreq = WritableConverter.arrayWritable2ShortArray(buffer);
-        buffer = new ArrayWritable(LongWritable.class);
+        buffer = new ArrayWritable(IntWritable.class);
         buffer.readFields(input);
         keyFreq = WritableConverter.arrayWritable2ShortArray(buffer);
     }

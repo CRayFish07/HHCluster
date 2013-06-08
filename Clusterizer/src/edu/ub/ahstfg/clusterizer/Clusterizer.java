@@ -129,7 +129,7 @@ public class Clusterizer {
     private int readNumDocs() throws IOException {
         FileSystem fs = Utils.accessHDFS();
         FSDataInputStream in = fs.open(new Path(FeatureDescriptor.NUM_DOCS_PATH));
-        int ret = Integer.valueOf(in.readUTF());
+        int ret = in.readInt();
         in.close();
         return ret;
     }

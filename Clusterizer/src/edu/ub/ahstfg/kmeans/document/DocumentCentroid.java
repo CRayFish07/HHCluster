@@ -11,7 +11,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.log4j.Logger;
 
@@ -118,10 +118,10 @@ public class DocumentCentroid implements Centroid, Writable {
     
     @Override
     public void readFields(DataInput in) throws IOException {
-        ArrayWritable k = new ArrayWritable(LongWritable.class);
+        ArrayWritable k = new ArrayWritable(IntWritable.class);
         k.readFields(in);
         keywordVector = WritableConverter.arrayWritable2ShortArray(k);
-        ArrayWritable t = new ArrayWritable(LongWritable.class);
+        ArrayWritable t = new ArrayWritable(IntWritable.class);
         t.readFields(in);
         termVector = WritableConverter.arrayWritable2ShortArray(t);
         DoubleWritable dist = new DoubleWritable();

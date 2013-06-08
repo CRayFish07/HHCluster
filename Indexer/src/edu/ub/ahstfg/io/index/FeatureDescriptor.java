@@ -110,8 +110,8 @@ public class FeatureDescriptor implements IndexRecord {
     public void writeNumFeatures() throws IOException {
         FileSystem fs = Utils.accessHDFS();
         FSDataOutputStream out = fs.create(new Path(NUM_FEATURES_PATH));
-        out.writeUTF(String.valueOf(keywords.length));
-        out.writeUTF(String.valueOf(terms.length));
+        out.writeInt(keywords.length);
+        out.writeInt(terms.length);
         out.close();
     }
     
@@ -128,9 +128,8 @@ public class FeatureDescriptor implements IndexRecord {
         }
         FileSystem fs = Utils.accessHDFS();
         FSDataInputStream in = fs.open(new Path(NUM_FEATURES_PATH));
-        features[0] = Integer.valueOf(in.readUTF());
-        features[1] = Integer.valueOf(in.readUTF());
-        in.close();
+        features[0] = in.readInt();
+        features[1] = in.readInt();
     }
     
 }

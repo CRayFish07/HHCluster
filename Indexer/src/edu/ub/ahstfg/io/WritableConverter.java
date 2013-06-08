@@ -5,7 +5,6 @@ import java.util.LinkedList;
 
 import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
@@ -142,11 +141,11 @@ public class WritableConverter {
      * @return Converted ArrayWritable.
      */
     public static ArrayWritable shortArray2ArrayWritable(short[] input) {
-        ArrayWritable ret = new ArrayWritable(LongWritable.class);
-        LongWritable[] t = new LongWritable[input.length];
+        ArrayWritable ret = new ArrayWritable(IntWritable.class);
+        IntWritable[] t = new IntWritable[input.length];
         int i = 0;
-        for (long s : input) {
-            t[i] = new LongWritable(s);
+        for (short s : input) {
+            t[i] = new IntWritable((int)s);
             i++;
         }
         ret.set(t);

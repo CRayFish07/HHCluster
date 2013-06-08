@@ -94,10 +94,16 @@ public class IndexRecordReader implements RecordReader<IntWritable, ArrayWritabl
                     if (!keywords[0].equals("keywords") || !terms[0].equals("terms")) {
                         continue;
                     }
-                    outSet[i] = new DocumentDescriptor(pair[0],
-                            Utils.stringArray2ShortArray(Utils.trimStringArray(terms[1]
-                                    .split(","))), Utils.stringArray2ShortArray(Utils
-                                            .trimStringArray(keywords[1].split(","))));
+                    try {
+                        outSet[i] = new DocumentDescriptor(pair[0],
+                                Utils.stringArray2ShortArray(Utils.trimStringArray(terms[1]
+                                        .split(","))), Utils.stringArray2ShortArray(Utils
+                                                .trimStringArray(keywords[1].split(","))));
+                    } catch(ArrayIndexOutOfBoundsException ex) {
+                        outSet[i] = new DocumentDescriptor(pair[0],
+                                Utils.stringArray2ShortArray(Utils.trimStringArray(terms[1]
+                                        .split(","))), new short[0]);
+                    }
                 } else {
                     i--;
                 }
