@@ -15,8 +15,8 @@ import org.apache.hadoop.mapred.Reporter;
 
 import edu.ub.ahstfg.io.document.ParsedDocument;
 import edu.ub.ahstfg.io.index.FeatureDescriptor;
-import edu.ub.ahstfg.io.index.IndexRecord;
 import edu.ub.ahstfg.io.index.Index;
+import edu.ub.ahstfg.io.index.IndexRecord;
 import edu.ub.ahstfg.utils.Utils;
 
 /**
@@ -73,7 +73,8 @@ Reducer<Text, ParsedDocument, Text, IndexRecord> {
     private void writeNumDocs(int docs) throws IOException {
         FileSystem fs = Utils.accessHDFS();
         FSDataOutputStream out = fs.create(new Path(FeatureDescriptor.NUM_DOCS_PATH));
-        out.writeInt(docs);
+        //out.writeInt(docs);
+        out.writeUTF(String.valueOf(docs));
         out.close();
     }
 }
