@@ -19,7 +19,6 @@ import org.commoncrawl.hadoop.mapred.ArcInputFormat;
 import edu.ub.ahstfg.indexer.mapred.IndexOutputFormat;
 import edu.ub.ahstfg.io.document.ParsedDocument;
 import edu.ub.ahstfg.io.index.IndexRecord;
-import edu.ub.ahstfg.utils.Utils;
 
 /**
  * Indexer launch class.
@@ -80,11 +79,6 @@ public class Indexer extends Configured implements Tool {
     }
     
     public static void main(String[] args) {
-        if(args.length != 1) {
-            LOG.error("Args: <Namenode adress>");
-            System.exit(-1);
-        }
-        Utils.setNamenodeAddress(args[0]);
         int res;
         try {
             res = ToolRunner.run(new Configuration(), new Indexer(), args);

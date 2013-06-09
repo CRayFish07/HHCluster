@@ -63,7 +63,7 @@ public class Centroids {
     public boolean isFinished() {
         for(Centroid c: centroids) {
             LOG.info("Distance: " + c.getDistance());
-            if(c.getDistance() > 10.0) {
+            if(c.getDistance() > 0.0) {
                 return false;
             }
         }

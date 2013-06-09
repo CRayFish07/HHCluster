@@ -23,17 +23,18 @@ public class Clusterizer {
     
     private static final Logger LOG = Logger.getLogger(Clusterizer.class);
     
-    private static final int P_K              = 0;
-    private static final int W_KEYWORDS       = 1;
-    private static final int W_TERMS          = 2;
-    private static final int N_MACHINES       = 3;
-    private static final int NAMENODE_ADDRESS = 4;
+    private static final int P_K            = 0;
+    private static final int W_KEYWORDS     = 1;
+    private static final int W_TERMS        = 2;
+    private static final int N_MACHINES     = 3;
+    private static final int MAX_ITERATIONS = 4;
     
     private ParamSet params;
     
     private Centroids centroids;
     
     private int nIter;
+    private int maxIter;
     private boolean finish;
     
     /**
@@ -44,6 +45,20 @@ public class Clusterizer {
      */
     public Clusterizer(int K, String args[]) throws IOException {
         LOG.info("Initiating...");
+        
+        if(K <= 0) {
+            LOG.error("K must be positive non-zero integer.");
+            System.exit(-1);
+        }
+        
+        maxIter = Integer.valueOf(args[MAX_ITERATIONS]);
+        if(maxIter <= 0) {
+            LOG.error("max_iterations must be positive non-zero integer.");
+            System.exit(-1);
+        }
+        
+        LOG.info("Maximum iteration number setted (" + maxIter + ")");
+        
         params    = new ParamSet();
         centroids = new Centroids(K, DocumentCentroid.class);
         params.setInt(ParamSet.K, K);
@@ -122,7 +137,7 @@ public class Clusterizer {
             } else {
                 LOG.info("Iteration " + nIter + " > New iteration required.");
             }
-        } while (!finish);
+        } while (!finish && nIter < maxIter);
         LOG.info("Finished in " + nIter + " iterations.");
     }
     
@@ -136,15 +151,14 @@ public class Clusterizer {
     
     public static void main(String[] args) {
         if(args.length != 5) {
-            LOG.error("Args: <K> <keywords_weight> <term_weight> <num_machines> <Namenode adress>");
+            LOG.error("Args: <K> <keywords_weight> <term_weight> <num_machines> <max_iterations>");
             return;
         }
-        Utils.HDFS_HOST = args[NAMENODE_ADDRESS];
         int k = 0;
         try {
             k = Integer.valueOf(args[P_K]);
         } catch(NumberFormatException ex) {
-            LOG.error("Args: <K> <keywords_weight> <term_weight> <num_machines> <Namenode adress>");
+            LOG.error("Args: <K> <keywords_weight> <term_weight> <num_machines> <max_iterations>");
             LOG.error("K must be an integer.");
             return;
         }

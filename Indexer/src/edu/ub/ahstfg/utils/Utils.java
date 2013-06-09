@@ -15,11 +15,6 @@ public class Utils {
     private static final Logger LOG = Logger.getLogger(Utils.class);
     
     /**
-     * Default HDFS namenode host. Can be changed.
-     */
-    public static String HDFS_HOST = "hdfs://161.116.52.45:9000/";
-    
-    /**
      * Trim all elements of a string array.
      * @param array Array to trim.
      * @return Trimmed array.
@@ -45,24 +40,13 @@ public class Utils {
     }
     
     /**
-     * Access HDFS specifying namenode host address.
-     * @param host Namenode host address.
-     * @return The FileSystem object to access the HDFS.
-     * @throws IOException
-     */
-    public static FileSystem accessHDFS(String host) throws IOException {
-        Configuration config = new Configuration();
-        //config.set("fs.default.name", host);
-        return FileSystem.get(config);
-    }
-    
-    /**
      * Access HDFS using default namenode host address.
      * @return The FileSystem object to access the HDFS.
      * @throws IOException
      */
     public static FileSystem accessHDFS() throws IOException {
-        return accessHDFS(HDFS_HOST);
+        Configuration config = new Configuration();
+        return FileSystem.get(config);
     }
     
     /**
@@ -73,15 +57,6 @@ public class Utils {
      */
     public static short randomIntRange(int min, int max) {
         return (short) (min + (Math.random() * ((max - min) + 1)));
-    }
-    
-    /**
-     * Sets the namenode address.
-     * @param string
-     */
-    public static void setNamenodeAddress(String string) {
-        HDFS_HOST = string;
-        LOG.info("Namenode address setted to: " + HDFS_HOST);
     }
     
 }
