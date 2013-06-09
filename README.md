@@ -1,4 +1,7 @@
-#Machine learning with Hadoop
-##Final degree project
-###Alberto Huélamo Segura
-This repo stores the source code of my final degree project.
+#K-means web clustering using Hadoop MapReduce
+
+Final Degree Project
+
+Alberto Huélamo Segura
+
+University of Barcelona

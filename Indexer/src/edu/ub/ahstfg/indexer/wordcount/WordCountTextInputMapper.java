@@ -11,14 +11,14 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
 public class WordCountTextInputMapper extends MapReduceBase implements
-        Mapper<LongWritable, Text, Text, LongWritable> {
-
+Mapper<LongWritable, Text, Text, LongWritable> {
+    
     private final static LongWritable ONE = new LongWritable(1);
-
+    
     @Override
     public void map(LongWritable key, Text value,
             OutputCollector<Text, LongWritable> output, Reporter reporter)
-            throws IOException {
+                    throws IOException {
         String line = value.toString();
         StringTokenizer tokenizer = new StringTokenizer(line);
         String word;
