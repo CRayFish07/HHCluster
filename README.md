@@ -1,10 +1,8 @@
-#K-means web clustering using Hadoop MapReduce
+#HHCluster
 
-Final Degree Project
+K-means web clustering using Hadoop MapReduce
 
-Alberto Huélamo Segura
-
-University of Barcelona
+This is Alberto Huélamo Segura's Final Degree Project at University of Barcelona.
 
 This software and all its files are under GNU GPL v3.0 license. See LICENSE.txt to
 read more about GNU GPL v3.0 license.
