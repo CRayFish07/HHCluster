@@ -18,3 +18,5 @@ This software needs and it is distributed with the following libraries:
 * [Google Guava](https://zcode.google.com/p/guava-libraries/)
 * [Hadoop Core](http://hadoop.apache.org/)
 * [jsoup](http://jsoup.org/)
+
+Please, check out [releases](https://github.com/AthalberthH/HHCluster/releases) page to download a software distribution.
