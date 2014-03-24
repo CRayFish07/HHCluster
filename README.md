@@ -13,7 +13,7 @@ This software needs and it is distributed with the following libraries:
 * [Apache HttpCore](http://hc.apache.org/httpcomponents-core-ga/)
 * [Apache log4j](http://logging.apache.org/log4j/1.2/)
 * [Google Gson](https://code.google.com/p/google-gson/)
-* [Google Guava](https://zcode.google.com/p/guava-libraries/)
+* [Google Guava](http://code.google.com/p/guava-libraries/)
 * [Hadoop Core](http://hadoop.apache.org/)
 * [jsoup](http://jsoup.org/)
 
